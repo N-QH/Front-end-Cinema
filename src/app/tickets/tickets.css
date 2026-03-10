@@ -1,0 +1,233 @@
+.tickets-container {
+  padding: 24px 0 80px 0;
+}
+
+.tickets-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 16px;
+}
+
+.back-btn {
+  font-size: 16px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.back-btn:hover {
+  color: var(--text-main);
+}
+
+.tickets-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.header-placeholder {
+  width: 100px;
+}
+
+.tickets-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.tabs {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 32px;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.tab {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-muted);
+  padding: 12px 0;
+  position: relative;
+  transition: color 0.2s;
+}
+
+.tab:hover {
+  color: var(--text-main);
+}
+
+.tab.active {
+  color: var(--primary-color);
+}
+
+.tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: var(--primary-color);
+}
+
+.ticket-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.ticket-stub-card {
+  display: flex;
+  background-color: var(--card-bg);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Creating the ticket cutout effect */
+.ticket-stub-card::before,
+.ticket-stub-card::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 30px;
+  height: 30px;
+  background-color: var(--bg-color);
+  border-radius: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.05); /* Optional shadow */
+}
+
+.ticket-stub-card::before {
+  left: -15px;
+}
+
+.ticket-stub-card::after {
+  right: -15px;
+}
+
+
+.ticket-visual {
+  padding: 24px;
+  background-color: #1f2937; /* Dark background for the poster side */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.placeholder-poster {
+  width: 120px;
+  height: 180px;
+  background-color: #374151;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  font-size: 40px;
+}
+
+.ticket-details {
+  flex: 1;
+  padding: 24px 32px;
+  border-right: 2px dashed var(--border-color);
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.status-badge.valid {
+  background-color: #ecfdf5;
+  color: #059669;
+}
+
+.movie-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 4px;
+}
+
+.movie-type {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+}
+
+.info-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-group .label {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-group .value {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.seat-value {
+  color: var(--primary-color) !important;
+}
+
+.codes {
+  font-family: monospace;
+  font-size: 16px !important;
+  letter-spacing: 1px;
+}
+
+.ticket-qr-section {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 200px;
+  background-color: #fafaf9;
+}
+
+.qr-code-placeholder {
+  width: 140px;
+  height: 140px;
+  background-color: white;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 80px;
+  color: var(--text-main);
+  margin-bottom: 12px;
+}
+
+.instruction {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+}

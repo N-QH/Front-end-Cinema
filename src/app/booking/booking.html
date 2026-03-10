@@ -1,0 +1,126 @@
+<div class="booking-container">
+  <div class="booking-header">
+    <button class="back-btn" routerLink="/movie/1">
+      <i class="fa-solid fa-arrow-left"></i> Quay lại
+    </button>
+    <h2>Chọn ghế & Rạp chiếu</h2>
+    <div class="header-placeholder"></div>
+  </div>
+
+  <div class="booking-content">
+    <div class="selection-panel">
+      
+      <div class="filter-group">
+        <h3>1. Chọn rạp</h3>
+        <select class="custom-select">
+          <option>CGV Vincom Center</option>
+          <option>Lotte Cinema Landmark</option>
+          <option>BHD Star Cineplex</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <h3>2. Chọn ngày & suất chiếu</h3>
+        <div class="date-selector">
+          <button class="date-btn active">
+            <span class="day-name">Hôm nay</span>
+            <span class="day-date">12/10</span>
+          </button>
+          <button class="date-btn">
+            <span class="day-name">Thứ 6</span>
+            <span class="day-date">13/10</span>
+          </button>
+          <button class="date-btn">
+            <span class="day-name">Thứ 7</span>
+            <span class="day-date">14/10</span>
+          </button>
+        </div>
+        
+        <div class="time-selector">
+          <button class="time-btn">09:30</button>
+          <button class="time-btn active">12:00</button>
+          <button class="time-btn">14:45</button>
+          <button class="time-btn">18:15</button>
+          <button class="time-btn">20:30</button>
+        </div>
+      </div>
+      
+    </div>
+
+    <div class="seat-map-panel">
+      <h3>3. Chọn ghế</h3>
+      
+      <div class="screen-container">
+        <div class="screen"></div>
+        <span class="screen-text">MÀN HÌNH</span>
+      </div>
+      
+      <div class="seat-grid">
+        <!-- Render seats -->
+        <div class="seat-row">
+          <span class="row-label">A</span>
+          <button class="seat"></button>
+          <button class="seat"></button>
+          <button class="seat occupied"></button>
+          <button class="seat occupied"></button>
+          <button class="seat"></button>
+          <button class="seat"></button>
+          <button class="seat selected"></button>
+          <button class="seat selected"></button>
+          <button class="seat"></button>
+          <button class="seat"></button>
+        </div>
+        
+        <div class="seat-row">
+          <span class="row-label">B</span>
+          <button class="seat"></button>
+          <button class="seat"></button>
+          <button class="seat occupied"></button>
+          <button class="seat"></button>
+          <button class="seat vip"></button>
+          <button class="seat vip"></button>
+          <button class="seat vip occupied"></button>
+          <button class="seat vip occupied"></button>
+          <button class="seat"></button>
+          <button class="seat"></button>
+        </div>
+        
+        <div class="seat-row">
+          <span class="row-label">C</span>
+          <button class="seat"></button>
+          <button class="seat"></button>
+          <button class="seat"></button>
+          <button class="seat"></button>
+          <button class="seat vip"></button>
+          <button class="seat vip"></button>
+          <button class="seat vip"></button>
+          <button class="seat vip"></button>
+          <button class="seat"></button>
+          <button class="seat"></button>
+        </div>
+      </div>
+      
+      <div class="seat-legend">
+        <div class="legend-item"><span class="seat-icon"></span> Thường</div>
+        <div class="legend-item"><span class="seat-icon vip"></span> VIP</div>
+        <div class="legend-item"><span class="seat-icon selected"></span> Đang chọn</div>
+        <div class="legend-item"><span class="seat-icon occupied"></span> Đã bán</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="booking-footer">
+    <div class="summary">
+      <div class="summary-info">
+        <span class="summary-label">Ghế chọn:</span>
+        <span class="summary-value">A7, A8</span>
+      </div>
+      <div class="summary-info">
+        <span class="summary-label">Tổng tiền:</span>
+        <span class="summary-value total-price">180.000đ</span>
+      </div>
+    </div>
+    <button class="continue-btn" routerLink="/payment">Tiếp tục thanh toán</button>
+  </div>
+</div>

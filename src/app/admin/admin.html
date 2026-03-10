@@ -1,0 +1,140 @@
+<div class="admin-layout">
+  
+  <aside class="admin-sidebar">
+    <div class="admin-brand">
+      <i class="fa-solid fa-film"></i>
+      <span>Cinema Admin</span>
+    </div>
+    
+    <nav class="admin-nav">
+      <a href="#" class="nav-item active">
+        <i class="fa-solid fa-chart-line"></i> Dashboard
+      </a>
+      <a href="#" class="nav-item">
+        <i class="fa-solid fa-video"></i> Quản lý Phim
+      </a>
+      <a href="#" class="nav-item">
+        <i class="fa-solid fa-building"></i> Quản lý Rạp
+      </a>
+      <a href="#" class="nav-item">
+        <i class="fa-solid fa-calendar-alt"></i> Lịch chiếu
+      </a>
+      <a href="#" class="nav-item">
+        <i class="fa-solid fa-users"></i> Khách hàng
+      </a>
+      <a href="#" class="nav-item" routerLink="/admin/reports">
+        <i class="fa-solid fa-file-invoice-dollar"></i> Báo cáo doanh thu
+      </a>
+    </nav>
+    
+    <div class="sidebar-footer">
+      <a href="#" class="nav-item" routerLink="/">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i> Về trang chủ
+      </a>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <header class="admin-header">
+      <div class="header-search">
+        <i class="fa-solid fa-search"></i>
+        <input type="text" placeholder="Tìm kiếm..." />
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn"><i class="fa-regular fa-bell"></i></button>
+        <div class="admin-user">
+          <img src="https://ui-avatars.com/api/?name=Admin&background=7c3aed&color=fff" alt="Admin" class="avatar" />
+          <span>Admin</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="admin-content">
+      <div class="page-header">
+        <h2>Quản lý Phim</h2>
+        <button class="primary-btn"><i class="fa-solid fa-plus"></i> Thêm phim mới</button>
+      </div>
+
+      <div class="stats-cards">
+        <div class="stat-card">
+          <div class="stat-icon pulse"><i class="fa-solid fa-ticket"></i></div>
+          <div class="stat-info">
+            <span class="stat-label">Vé bán hôm nay</span>
+            <span class="stat-value">1,245</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon purple"><i class="fa-solid fa-video"></i></div>
+          <div class="stat-info">
+            <span class="stat-label">Phim đang chiếu</span>
+            <span class="stat-value">24</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="fa-solid fa-dollar-sign"></i></div>
+          <div class="stat-info">
+            <span class="stat-label">Doanh thu (Ngày)</span>
+            <span class="stat-value">124.5M ₫</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon blue"><i class="fa-solid fa-users"></i></div>
+          <div class="stat-info">
+            <span class="stat-label">Người dùng mới</span>
+            <span class="stat-value">+145</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-table-wrapper">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Tên Phim</th>
+              <th>Thể loại</th>
+              <th>Thời lượng</th>
+              <th>Trạng thái</th>
+              <th>Hành động</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>#001</td>
+              <td>Mưa đỏ</td>
+              <td>Hành động, Tâm lý</td>
+              <td>120 phút</td>
+              <td><span class="status-badge valid">Đang chiếu</span></td>
+              <td>
+                <button class="action-btn edit"><i class="fa-solid fa-pen"></i></button>
+                <button class="action-btn delete"><i class="fa-solid fa-trash"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>#002</td>
+              <td>Avenger: Secret Wars</td>
+              <td>Hành động, Viễn tưởng</td>
+              <td>165 phút</td>
+              <td><span class="status-badge pending">Sắp chiếu</span></td>
+              <td>
+                <button class="action-btn edit"><i class="fa-solid fa-pen"></i></button>
+                <button class="action-btn delete"><i class="fa-solid fa-trash"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>#003</td>
+              <td>Inside Out 2</td>
+              <td>Hoạt hình, Gia đình</td>
+              <td>100 phút</td>
+              <td><span class="status-badge error">Ngừng chiếu</span></td>
+              <td>
+                <button class="action-btn edit"><i class="fa-solid fa-pen"></i></button>
+                <button class="action-btn delete"><i class="fa-solid fa-trash"></i></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>

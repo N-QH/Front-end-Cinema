@@ -1,0 +1,48 @@
+:root {
+  --font-family: 'Inter', sans-serif;
+  --bg-color: #fcfcfc;
+  --text-main: #1f2937;
+  --text-muted: #6b7280;
+  --primary-color: #7c3aed; /* Purple for active tab, avatar, etc. */
+  --primary-light: #ede9fe;
+  --border-color: #e5e7eb;
+  --search-bg: #f3f4f6;
+  --card-bg: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button {
+  font-family: var(--font-family);
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input {
+  font-family: var(--font-family);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}

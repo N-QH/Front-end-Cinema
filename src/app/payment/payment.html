@@ -1,0 +1,123 @@
+<div class="payment-container">
+  <div class="payment-header">
+    <button class="back-btn" routerLink="/booking/1">
+      <i class="fa-solid fa-arrow-left"></i> Quay lại
+    </button>
+    <h2>Thanh toán</h2>
+    <div class="header-placeholder"></div>
+  </div>
+
+  <div class="payment-content">
+    
+    <div class="payment-methods-panel">
+      <h3>Hình thức thanh toán</h3>
+      
+      <div class="method-list">
+        <label class="method-item">
+          <input type="radio" name="payment-method" checked />
+          <div class="method-card">
+            <div class="method-icon"><i class="fa-regular fa-credit-card"></i></div>
+            <div class="method-info">
+              <span class="method-name">Thẻ tín dụng / Ghi nợ</span>
+              <span class="method-desc">Thanh toán qua Visa, Mastercard, JCB</span>
+            </div>
+            <i class="fa-solid fa-check method-check"></i>
+          </div>
+        </label>
+        
+        <label class="method-item">
+          <input type="radio" name="payment-method" />
+          <div class="method-card">
+            <div class="method-icon m-wallet">MoMo</div>
+            <div class="method-info">
+              <span class="method-name">Ví điện tử MoMo</span>
+              <span class="method-desc">Thanh toán bằng ứng dụng MoMo</span>
+            </div>
+            <i class="fa-solid fa-check method-check"></i>
+          </div>
+        </label>
+
+        <label class="method-item">
+          <input type="radio" name="payment-method" />
+          <div class="method-card">
+            <div class="method-icon z-wallet">ZaloPay</div>
+            <div class="method-info">
+              <span class="method-name">Ví đại lý ZaloPay</span>
+              <span class="method-desc">Thanh toán qua ứng dụng ZaloPay</span>
+            </div>
+            <i class="fa-solid fa-check method-check"></i>
+          </div>
+        </label>
+      </div>
+      
+      <div class="disclaimer">
+        <i class="fa-solid fa-circle-info"></i>
+        Bằng việc nhấp vào <strong style="margin: 0 4px;">Thanh Toán</strong>, bạn đồng ý với các Điều khoản & Điều kiện của chúng tôi.
+      </div>
+
+    </div>
+
+    <div class="order-summary-panel">
+      <h3>Thông tin đặt vé</h3>
+      
+      <div class="ticket-card">
+        <div class="ticket-movie">
+          <div class="ticket-poster placeholder-poster"><i class="fa-solid fa-image"></i></div>
+          <div class="ticket-details">
+            <span class="age-badge">16+</span>
+            <h4>Mưa đỏ</h4>
+            <p>2D Phụ đề Tiếng Việt</p>
+          </div>
+        </div>
+        
+        <div class="ticket-divider"></div>
+        
+        <div class="ticket-info-grid">
+          <div class="info-item">
+            <span class="info-label">Rạp</span>
+            <span class="info-value">CGV Vincom Center</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Suất chiếu</span>
+            <span class="info-value">12:00, Hôm nay</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Phòng chiếu</span>
+            <span class="info-value">CINEMA 5</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Ghế</span>
+            <span class="info-value">A7, A8</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="price-breakdown">
+        <div class="price-row">
+          <span>Vé x2</span>
+          <span>180.000đ</span>
+        </div>
+        <div class="price-row">
+          <span>Phí giao dịch</span>
+          <span>10.000đ</span>
+        </div>
+        
+        <div class="promocode-group">
+          <div class="input-wrapper">
+            <i class="fa-solid fa-ticket"></i>
+            <input type="text" placeholder="Nhập mã giảm giá" />
+          </div>
+          <button class="apply-btn">Áp dụng</button>
+        </div>
+        
+        <div class="price-total">
+          <span>Tổng cộng</span>
+          <span class="total-amount">190.000đ</span>
+        </div>
+      </div>
+
+      <button class="checkout-btn" routerLink="/tickets">Thanh Toán</button>
+    </div>
+    
+  </div>
+</div>

@@ -1,0 +1,139 @@
+<div class="admin-layout">
+  
+  <aside class="admin-sidebar" style="z-index: 10;">
+    <div class="admin-brand">
+      <i class="fa-solid fa-film"></i>
+      <span>Cinema Admin</span>
+    </div>
+    
+    <nav class="admin-nav">
+      <a href="#" class="nav-item" routerLink="/admin">
+        <i class="fa-solid fa-chart-line"></i> Dashboard
+      </a>
+      <a href="#" class="nav-item">
+        <i class="fa-solid fa-video"></i> Quản lý Phim
+      </a>
+      <a href="#" class="nav-item">
+        <i class="fa-solid fa-building"></i> Quản lý Rạp
+      </a>
+      <a href="#" class="nav-item">
+        <i class="fa-solid fa-calendar-alt"></i> Lịch chiếu
+      </a>
+      <a href="#" class="nav-item">
+        <i class="fa-solid fa-users"></i> Khách hàng
+      </a>
+      <a href="#" class="nav-item active">
+        <i class="fa-solid fa-file-invoice-dollar"></i> Báo cáo doanh thu
+      </a>
+    </nav>
+    
+    <div class="sidebar-footer">
+      <a href="#" class="nav-item" routerLink="/">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i> Về trang chủ
+      </a>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <header class="admin-header">
+      <div class="header-search">
+        <i class="fa-solid fa-search"></i>
+        <input type="text" placeholder="Tìm kiếm báo cáo..." />
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn"><i class="fa-regular fa-bell"></i></button>
+        <div class="admin-user">
+          <img src="https://ui-avatars.com/api/?name=Admin&background=7c3aed&color=fff" alt="Admin" class="avatar" />
+          <span>Admin</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="admin-content">
+      <div class="page-header">
+        <h2>Báo cáo Doanh thu</h2>
+        <div class="header-filters">
+          <select class="report-select">
+            <option>Theo tuần</option>
+            <option>Theo tháng</option>
+            <option>Theo năm</option>
+            <option>Tùy chỉnh...</option>
+          </select>
+          <button class="export-btn"><i class="fa-solid fa-download"></i> Xuất báo cáo</button>
+        </div>
+      </div>
+
+      <div class="chart-section gap-cols">
+        <div class="chart-card main-chart">
+          <div class="card-header">
+            <h3>Doanh thu tổng quan</h3>
+            <span class="trend up"><i class="fa-solid fa-arrow-trend-up"></i> +12.5% so với tháng trước</span>
+          </div>
+          <div class="chart-placeholder bar-chart">
+            <!-- Simulated Bar Chart CSS -->
+            <div class="bar" style="height: 40%"><span>T2</span></div>
+            <div class="bar" style="height: 60%"><span>T3</span></div>
+            <div class="bar" style="height: 50%"><span>T4</span></div>
+            <div class="bar" style="height: 80%"><span>T5</span></div>
+            <div class="bar" style="height: 70%"><span>T6</span></div>
+            <div class="bar" style="height: 95%; background-color: var(--primary-color);"><span>T7</span></div>
+            <div class="bar" style="height: 90%; background-color: var(--primary-color);"><span>CN</span></div>
+          </div>
+        </div>
+
+        <div class="chart-card pie-chart-area">
+          <div class="card-header">
+            <h3>Tỷ trọng Theo Rạp</h3>
+          </div>
+          <div class="chart-placeholder pie-chart">
+            <div class="pie"></div>
+          </div>
+          <div class="pie-legend">
+            <div class="legend-item"><span class="dot d1"></span> CGV Vincom</div>
+            <div class="legend-item"><span class="dot d2"></span> Lotte Landmark</div>
+            <div class="legend-item"><span class="dot d3"></span> BHD Star</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="top-movies-section">
+        <h3>Top Phim Doanh Thu Cao Nhất (Tháng)</h3>
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th>Hạng</th>
+              <th>Tên Phim</th>
+              <th>Lượt xem</th>
+              <th>Doanh thu</th>
+              <th>Xu hướng</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="rank first">1</span></td>
+              <td>Mưa đỏ</td>
+              <td>125,430</td>
+              <td class="money">12.5 Tỷ ₫</td>
+              <td class="trend up">+4.5%</td>
+            </tr>
+            <tr>
+              <td><span class="rank second">2</span></td>
+              <td>Inside Out 2</td>
+              <td>98,200</td>
+              <td class="money">9.8 Tỷ ₫</td>
+              <td class="trend up">+2.1%</td>
+            </tr>
+            <tr>
+              <td><span class="rank third">3</span></td>
+              <td>Doraemon</td>
+              <td>85,120</td>
+              <td class="money">8.5 Tỷ ₫</td>
+              <td class="trend down">-1.2%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </main>
+</div>

@@ -1,0 +1,34 @@
+<div class="movie-item" routerLink="/movie/2" style="cursor: pointer;">
+  <div class="movie-image-placeholder">
+    <!-- Abstract shapes inside placeholder snippet -->
+    <div class="mini-shape mini-shape-1"></div>
+    <div class="mini-shape mini-shape-2"></div>
+    <div class="mini-shape mini-shape-3"></div>
+  </div>
+  
+  <div class="movie-info">
+    <div class="movie-header">
+      <h3 class="movie-title">List item</h3>
+      <div class="movie-meta">
+        <div class="stars">
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+        </div>
+        <button class="favorite-btn" (click)="$event.stopPropagation()">
+          <i class="fa-regular fa-heart"></i>
+        </button>
+      </div>
+    </div>
+    
+    <div class="movie-subtitle">
+      Category &bull; $$ &bull; 1.2 miles away
+    </div>
+    
+    <div class="movie-description">
+      Supporting line text lorem ipsum dolor sit amet, consectetur.
+    </div>
+  </div>
+</div>
