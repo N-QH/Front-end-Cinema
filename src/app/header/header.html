@@ -17,11 +17,23 @@
       <i class="fa-solid fa-magnifying-glass search-icon"></i>
     </div>
     
-    <div class="auth-section" routerLink="/auth">
-      <span class="auth-text">Đăng nhập/ Đăng ký</span>
-      <div class="user-avatar">
-        <i class="fa-regular fa-user"></i>
+    @if (authService.currentUserValue) {
+      <div class="auth-section logged-in">
+        <span class="auth-text" (click)="logout($event)" style="margin-right: 15px;">Đăng xuất</span>
+        <div class="user-avatar" routerLink="/tickets" title="Tickets" style="margin-right: 10px;">
+          <i class="fa-solid fa-ticket"></i>
+        </div>
+        <div class="user-avatar" routerLink="/admin" title="Admin">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
       </div>
-    </div>
+    } @else {
+      <div class="auth-section" routerLink="/auth">
+        <span class="auth-text">Đăng nhập/ Đăng ký</span>
+        <div class="user-avatar">
+          <i class="fa-regular fa-user"></i>
+        </div>
+      </div>
+    }
   </div>
 </header>

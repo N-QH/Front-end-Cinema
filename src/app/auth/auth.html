@@ -1,16 +1,51 @@
 <div class="auth-container">
   <div class="auth-card">
     <div class="auth-header">
-      <h2 class="auth-title">Đăng nhập / Đăng ký</h2>
-      <p class="auth-subtitle">Welcome back! Please enter your details.</p>
+      <h2 class="auth-title">
+        @if (isLoginMode) { Đăng nhập } 
+        @else { Đăng ký tài khoản }
+      </h2>
+      <p class="auth-subtitle">
+        @if (isLoginMode) { Welcome back! Please enter your details. }
+        @else { Join us to book the best seats in town. }
+      </p>
     </div>
 
-    <form class="auth-form">
+    @if (error) {
+      <div class="error-message" style="color: red; margin-bottom: 16px; text-align: center; font-size: 14px;">
+        {{ error }}
+      </div>
+    }
+
+    <form class="auth-form" (ngSubmit)="onSubmit()" #authForm="ngForm">
+      
+      @if (!isLoginMode) {
+        <div class="form-group">
+          <label for="name">Họ và tên</label>
+          <div class="input-wrapper">
+            <i class="fa-regular fa-user"></i>
+            <input type="text" id="name" name="name" [(ngModel)]="registerData.name" placeholder="John Doe" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Số điện thoại</label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-phone"></i>
+            <input type="tel" id="phone" name="phone" [(ngModel)]="registerData.mobileNo" placeholder="09xxxxxxx" required />
+          </div>
+        </div>
+      }
+
       <div class="form-group">
         <label for="email">Tài khoản (Email)</label>
         <div class="input-wrapper">
           <i class="fa-regular fa-envelope"></i>
-          <input type="email" id="email" placeholder="Nhập email của bạn" />
+          @if (isLoginMode) {
+            <input type="email" id="email" name="email" [(ngModel)]="loginData.username" placeholder="Nhập email của bạn" required />
+          } @else {
+            <input type="email" id="email" name="email" [(ngModel)]="registerData.emailId" placeholder="Nhập email của bạn" required />
+          }
         </div>
       </div>
 
@@ -18,32 +53,48 @@
         <label for="password">Mật khẩu</label>
         <div class="input-wrapper">
           <i class="fa-solid fa-lock"></i>
-          <input type="password" id="password" placeholder="Nhập mật khẩu" />
+          @if (isLoginMode) {
+            <input type="password" id="password" name="password" [(ngModel)]="loginData.password" placeholder="Nhập mật khẩu" required />
+          } @else {
+            <input type="password" id="password" name="password" [(ngModel)]="registerData.password" placeholder="Tạo mật khẩu" required />
+          }
         </div>
       </div>
 
-      <div class="form-actions">
-        <label class="remember-me">
-          <input type="checkbox" />
-          <span>Ghi nhớ đăng nhập</span>
-        </label>
-        <a href="#" class="forgot-password">Quên mật khẩu?</a>
-      </div>
+      @if (isLoginMode) {
+        <div class="form-actions">
+          <label class="remember-me">
+            <input type="checkbox" />
+            <span>Ghi nhớ đăng nhập</span>
+          </label>
+          <a href="#" class="forgot-password">Quên mật khẩu?</a>
+        </div>
+      }
 
-      <button type="submit" class="submit-btn">Đăng nhập</button>
-      
-      <div class="divider">
-        <span>Hoặc</span>
-      </div>
-
-      <button type="button" class="social-btn google-btn">
-        <i class="fa-brands fa-google"></i>
-        Tiếp tục với Google
+      <button type="submit" class="submit-btn" [disabled]="isLoading">
+        @if (isLoading) { Đang xử lý... }
+        @else {
+          {{ isLoginMode ? 'Đăng nhập' : 'Đăng ký' }}
+        }
       </button>
+      
+      @if (isLoginMode) {
+        <div class="divider">
+          <span>Hoặc</span>
+        </div>
+
+        <button type="button" class="social-btn google-btn">
+          <i class="fa-brands fa-google"></i>
+          Tiếp tục với Google
+        </button>
+      }
     </form>
     
     <p class="auth-footer">
-      Chưa có tài khoản? <a href="#" class="register-link">Đăng ký ngay</a>
+      {{ isLoginMode ? 'Chưa có tài khoản?' : 'Đã có tài khoản?' }} 
+      <a href="javascript:void(0)" class="register-link" (click)="toggleMode()">
+        {{ isLoginMode ? 'Đăng ký ngay' : 'Đăng nhập' }}
+      </a>
     </p>
   </div>
 </div>
