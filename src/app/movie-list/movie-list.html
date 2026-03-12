@@ -1,12 +1,13 @@
-<div class="movie-list">
-  @if (isLoading) {
-    <div style="padding: 40px; text-align: center; color: var(--text-secondary);">
-      Loading movies...
-    </div>
-  } @else {
-    @for (movie of movies; track movie.id) {
-      <app-movie-item [movie]="movie"></app-movie-item>
+<div class="movie-section">
+  <div class="movie-grid">
+    @if (isLoading) {
+      <div class="loading-state">Đang tải danh sách phim...</div>
+    } @else {
+      @for (movie of movies; track movie.id) {
+        <app-movie-item [movie]="movie"></app-movie-item>
+      }
     }
-  }
+  </div>
+  
   <app-pagination></app-pagination>
 </div>

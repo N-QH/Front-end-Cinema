@@ -19,7 +19,8 @@ export class MovieList implements OnInit {
   ngOnInit() {
     this.movieService.getMovies().subscribe({
       next: (data) => {
-        this.movies = data;
+        // Just show all movies on the home page, or limit to 8
+        this.movies = data.slice(0, 8); 
         this.isLoading = false;
       },
       error: () => this.isLoading = false

@@ -1,0 +1,59 @@
+<div class="movie-section" style="margin-top: 60px;">
+  <!-- Tabs -->
+  <div class="movie-tabs">
+    <button class="tab-btn" [class.active]="activeTab === 'NOW_SHOWING'" (click)="setTab('NOW_SHOWING')">Phim đang chiếu</button>
+    <button class="tab-btn" [class.active]="activeTab === 'COMING_SOON'" (click)="setTab('COMING_SOON')">Phim sắp chiếu</button>
+  </div>
+  
+  <!-- Category Filters -->
+  <div class="category-filters-container">
+    <div class="dropdown-wrapper" (mouseenter)="showGenreDropdown = true" (mouseleave)="showGenreDropdown = false">
+      <button class="dropdown-toggle" (click)="showGenreDropdown = !showGenreDropdown">
+        Thể loại <i class="fa-solid fa-chevron-down ms-2"></i>
+      </button>
+      
+      @if (showGenreDropdown) {
+        <div class="dropdown-menu">
+          <div class="dropdown-grid">
+            @for (genre of availableGenres; track genre) {
+              <div class="genre-item" 
+                   [class.active]="selectedGenres.includes(genre)"
+                   (click)="toggleGenre(genre)">
+                {{ genreTranslations[genre] || genre }}
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Selected Genres Bar -->
+    @if (selectedGenres.length > 0) {
+      <div class="selected-genres-bar">
+        @for (genre of selectedGenres; track genre) {
+          <div class="selected-chip">
+            {{ genreTranslations[genre] || genre }}
+            <button class="remove-chip-btn" (click)="toggleGenre(genre)">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Movie List Grid -->
+  <div class="movie-grid">
+    @if (isLoading) {
+      <div class="loading-state">Đang tải danh sách phim...</div>
+    } @else if (filteredMovies.length === 0) {
+      <div class="empty-state">Không có phim nào phù hợp với thể loại đã chọn.</div>
+    } @else {
+      @for (movie of filteredMovies; track movie.id) {
+        <app-movie-item [movie]="movie"></app-movie-item>
+      }
+    }
+  </div>
+  
+  <app-pagination></app-pagination>
+</div>

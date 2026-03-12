@@ -6,9 +6,9 @@
   </div>
   
   <nav class="header-nav">
-    <a href="#" class="nav-item active">Phim</a>
-    <a href="#" class="nav-item">Rạp chiếu</a>
-    <a href="#" class="nav-item">Thể loại</a>
+    <a routerLink="/" [routerLinkActiveOptions]="{exact: true}" routerLinkActive="active" class="nav-item">Phim</a>
+    <a routerLink="/cinemas" routerLinkActive="active" class="nav-item">Rạp chiếu</a>
+    <a routerLink="/category" routerLinkActive="active" class="nav-item">Thể loại</a>
   </nav>
 
   <div class="header-right">

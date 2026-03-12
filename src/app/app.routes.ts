@@ -10,9 +10,11 @@ import { Reports } from './reports/reports';
 import { AdminTheaters } from './admin-theaters/admin-theaters';
 import { AdminShows } from './admin-shows/admin-shows';
 import { Profile } from './profile/profile';
+import { Category } from './category/category';
 
 export const routes: Routes = [
   { path: '', component: Home },
+  { path: 'category', component: Category },
   { path: 'auth', component: Auth },
   { path: 'movie/:id', component: MovieDetails },
   { path: 'booking/:id', component: Booking },
