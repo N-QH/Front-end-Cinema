@@ -1,8 +1,12 @@
 <div class="movie-list">
-  <app-movie-item></app-movie-item>
-  <app-movie-item></app-movie-item>
-  <app-movie-item></app-movie-item>
-  <app-movie-item></app-movie-item>
-  <app-movie-item></app-movie-item>
+  @if (isLoading) {
+    <div style="padding: 40px; text-align: center; color: var(--text-secondary);">
+      Loading movies...
+    </div>
+  } @else {
+    @for (movie of movies; track movie.id) {
+      <app-movie-item [movie]="movie"></app-movie-item>
+    }
+  }
   <app-pagination></app-pagination>
 </div>

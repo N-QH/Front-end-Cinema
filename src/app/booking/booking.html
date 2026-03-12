@@ -12,36 +12,32 @@
       
       <div class="filter-group">
         <h3>1. Chọn rạp</h3>
-        <select class="custom-select">
-          <option>CGV Vincom Center</option>
-          <option>Lotte Cinema Landmark</option>
-          <option>BHD Star Cineplex</option>
+        <select class="custom-select" [(ngModel)]="selectedTheaterId">
+          <option [ngValue]="null">-- Chọn rạp --</option>
+          @for (theater of theaters; track theater.id) {
+            <option [ngValue]="theater.id">{{ theater.name }} - {{ theater.address }}</option>
+          }
         </select>
       </div>
 
       <div class="filter-group">
-        <h3>2. Chọn ngày & suất chiếu</h3>
-        <div class="date-selector">
-          <button class="date-btn active">
-            <span class="day-name">Hôm nay</span>
-            <span class="day-date">12/10</span>
-          </button>
-          <button class="date-btn">
-            <span class="day-name">Thứ 6</span>
-            <span class="day-date">13/10</span>
-          </button>
-          <button class="date-btn">
-            <span class="day-name">Thứ 7</span>
-            <span class="day-date">14/10</span>
-          </button>
-        </div>
+        <h3>2. Chọn suất chiếu</h3>
         
-        <div class="time-selector">
-          <button class="time-btn">09:30</button>
-          <button class="time-btn active">12:00</button>
-          <button class="time-btn">14:45</button>
-          <button class="time-btn">18:15</button>
-          <button class="time-btn">20:30</button>
+        <div class="time-selector" style="margin-top: 15px;">
+          @if (shows.length === 0) {
+            <p style="color: var(--text-secondary); font-size: 14px;">Không có suất chiếu nào cho rạp này.</p>
+          } @else {
+            @for (show of shows; track show.id) {
+              <!-- Ideally, we should filter by selectedTheaterId but the mock structure holds flat lists. Let's just list shows for the movie -->
+              <button 
+                class="time-btn" 
+                [class.active]="selectedShowId === show.id"
+                (click)="selectedShowId = show.id"
+              >
+                {{ show.showTime }} <br/><small style="font-size: 11px;">{{ show.showDate | date:'dd/MM' }}</small>
+              </button>
+            }
+          }
         </div>
       </div>
       
@@ -57,47 +53,18 @@
       
       <div class="seat-grid">
         <!-- Render seats -->
-        <div class="seat-row">
-          <span class="row-label">A</span>
-          <button class="seat"></button>
-          <button class="seat"></button>
-          <button class="seat occupied"></button>
-          <button class="seat occupied"></button>
-          <button class="seat"></button>
-          <button class="seat"></button>
-          <button class="seat selected"></button>
-          <button class="seat selected"></button>
-          <button class="seat"></button>
-          <button class="seat"></button>
-        </div>
-        
-        <div class="seat-row">
-          <span class="row-label">B</span>
-          <button class="seat"></button>
-          <button class="seat"></button>
-          <button class="seat occupied"></button>
-          <button class="seat"></button>
-          <button class="seat vip"></button>
-          <button class="seat vip"></button>
-          <button class="seat vip occupied"></button>
-          <button class="seat vip occupied"></button>
-          <button class="seat"></button>
-          <button class="seat"></button>
-        </div>
-        
-        <div class="seat-row">
-          <span class="row-label">C</span>
-          <button class="seat"></button>
-          <button class="seat"></button>
-          <button class="seat"></button>
-          <button class="seat"></button>
-          <button class="seat vip"></button>
-          <button class="seat vip"></button>
-          <button class="seat vip"></button>
-          <button class="seat vip"></button>
-          <button class="seat"></button>
-          <button class="seat"></button>
-        </div>
+        @for (row of ['A', 'B', 'C']; track row) {
+          <div class="seat-row">
+            <span class="row-label">{{ row }}</span>
+            @for (num of [1,2,3,4,5,6,7,8,9,10]; track num) {
+              <button 
+                class="seat" 
+                [class.selected]="isSeatSelected(row + num)"
+                (click)="toggleSeat(row + num)"
+              ></button>
+            }
+          </div>
+        }
       </div>
       
       <div class="seat-legend">
@@ -114,13 +81,21 @@
     <div class="summary">
       <div class="summary-info">
         <span class="summary-label">Ghế chọn:</span>
-        <span class="summary-value">A7, A8</span>
+        <span class="summary-value">
+          @if (selectedSeats.length > 0) {
+            {{ selectedSeats.join(', ') }}
+          } @else {
+            Chưa chọn
+          }
+        </span>
       </div>
       <div class="summary-info">
         <span class="summary-label">Tổng tiền:</span>
-        <span class="summary-value total-price">180.000đ</span>
+        <span class="summary-value total-price">{{ totalPrice | number:'1.0-0' }}đ</span>
       </div>
     </div>
-    <button class="continue-btn" routerLink="/payment">Tiếp tục thanh toán</button>
+    <button class="continue-btn" (click)="onBook()" [disabled]="!selectedTheaterId || !selectedShowId || selectedSeats.length === 0">
+      Tiếp tục thanh toán
+    </button>
   </div>
 </div>

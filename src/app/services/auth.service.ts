@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { jwtDecode } from 'jwt-decode';
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +22,23 @@ export class AuthService {
         return localStorage.getItem('token');
     }
     return null;
+  }
+
+  getUserEmail(): string | null {
+    const token = this.getToken();
+    if (token) {
+      try {
+        const decodedToken: any = jwtDecode(token);
+        return decodedToken.sub;
+      } catch (error) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  getUserByEmail(email: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/email/${email}`);
   }
 
   login(credentials: any): Observable<any> {
@@ -43,4 +61,13 @@ export class AuthService {
     }
     this.currentUserSubject.next(null);
   }
+
+  getUserProfile(userId: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${userId}`);
+  }
+
+  updateProfile(userId: number, userRequest: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${userId}`, userRequest, { responseType: 'text' });
+  }
 }
+

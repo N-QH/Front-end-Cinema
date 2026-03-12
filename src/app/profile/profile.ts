@@ -1,0 +1,105 @@
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { RouterLink, Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { AuthService } from '../services/auth.service';
+import { ToastService } from '../services/toast.service';
+
+@Component({
+  selector: 'app-profile',
+  imports: [RouterLink, CommonModule, FormsModule],
+  templateUrl: './profile.html',
+  styleUrl: './profile.css',
+})
+export class Profile implements OnInit {
+  isLoading = true;
+  isSaving = false;
+
+  userId = -1;
+
+  userProfile: any = null;
+  newPassword = '';
+
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private toastService: ToastService,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  ngOnInit() {
+    this.loadProfile();
+  }
+
+  loadProfile() {
+    this.isLoading = true;
+    const email = this.authService.getUserEmail();
+    
+    if (!email) {
+      this.toastService.showError('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+      this.router.navigate(['/auth']);
+      return;
+    }
+
+    this.authService.getUserByEmail(email).subscribe({
+      next: (res) => {
+        this.userProfile = res;
+        this.userId = res.id;
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.toastService.showError('Không thể tải thông tin hồ sơ.');
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  onSubmit() {
+    this.isSaving = true;
+
+    const reqOptions: any = {
+      name: this.userProfile.name,
+      emailId: this.userProfile.emailId,
+      mobileNo: this.userProfile.mobileNo,
+      roles: this.userProfile.roles || 'USER',
+      userImage: this.userProfile.userImage
+    };
+
+    if (this.newPassword && this.newPassword.trim() !== '') {
+      reqOptions.password = this.newPassword;
+    }
+
+    this.authService.updateProfile(this.userId, reqOptions).subscribe({
+      next: (res) => {
+        // Even if res is not a perfect string, we consider it success here.
+        this.toastService.showSuccess('Cập nhật thông tin thành công!');
+        this.isSaving = false;
+        this.newPassword = ''; // Reset password field
+        
+        // Update local object to reflect new values
+        this.userProfile.name = reqOptions.name;
+        this.userProfile.mobileNo = reqOptions.mobileNo;
+        this.userProfile.userImage = reqOptions.userImage;
+        
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        // Check if error is actually a success response parsed as error by Angular (status 200 but not JSON)
+        if (err.status === 200) {
+          this.toastService.showSuccess('Cập nhật thông tin thành công!');
+          this.isSaving = false;
+          this.newPassword = ''; // Reset password field
+          this.cdr.detectChanges();
+          return;
+        }
+
+        const errMsg = typeof err.error === 'string' ? err.error : (err.message || 'Cập nhật thông tin thất bại.');
+        this.toastService.showError(errMsg);
+        this.isSaving = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+}

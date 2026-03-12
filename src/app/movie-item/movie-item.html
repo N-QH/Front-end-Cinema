@@ -1,4 +1,4 @@
-<div class="movie-item" routerLink="/movie/2" style="cursor: pointer;">
+<div class="movie-item" [routerLink]="['/movie', movie?.id]" style="cursor: pointer;">
   <div class="movie-image-placeholder">
     <!-- Abstract shapes inside placeholder snippet -->
     <div class="mini-shape mini-shape-1"></div>
@@ -8,14 +8,11 @@
   
   <div class="movie-info">
     <div class="movie-header">
-      <h3 class="movie-title">List item</h3>
+      <h3 class="movie-title">{{ movie?.movieName || 'Loading...' }}</h3>
       <div class="movie-meta">
         <div class="stars">
           <i class="fa-solid fa-star"></i>
-          <i class="fa-solid fa-star"></i>
-          <i class="fa-solid fa-star"></i>
-          <i class="fa-solid fa-star"></i>
-          <i class="fa-solid fa-star"></i>
+          <span style="font-size: 14px; margin-left: 4px; font-weight: 500;">{{ movie?.rating || 0 }}</span>
         </div>
         <button class="favorite-btn" (click)="$event.stopPropagation()">
           <i class="fa-regular fa-heart"></i>
@@ -24,11 +21,11 @@
     </div>
     
     <div class="movie-subtitle">
-      Category &bull; $$ &bull; 1.2 miles away
+      {{ movie?.genre }} &bull; {{ movie?.language }} &bull; {{ movie?.duration }} phút
     </div>
     
     <div class="movie-description">
-      Supporting line text lorem ipsum dolor sit amet, consectetur.
+      Khởi chiếu: {{ movie?.releaseDate | date:'dd/MM/yyyy' }}
     </div>
   </div>
 </div>

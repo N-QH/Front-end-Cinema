@@ -14,41 +14,41 @@
     </div>
     
     <div class="movie-info-main">
-      <h1 class="movie-title-large">Mưa đỏ (Red Rain)</h1>
-      <div class="movie-meta-tags">
-        <span class="tag age-tag">16+</span>
-        <span class="tag">Hành động</span>
-        <span class="tag">Tâm lý</span>
-        <span class="tag duration"><i class="fa-regular fa-clock"></i> 120 phút</span>
-      </div>
-      
-      <div class="movie-rating-row">
-        <div class="rating-badge">
-          <i class="fa-solid fa-star"></i>
-          <span>9.5</span>
+      @if (isLoading) {
+        <h2>Loading movie...</h2>
+      } @else if (movie) {
+        <h1 class="movie-title-large">{{ movie.movieName }}</h1>
+        <div class="movie-meta-tags">
+          <span class="tag age-tag">16+</span>
+          <span class="tag">{{ movie.genre }}</span>
+          <span class="tag">{{ movie.language }}</span>
+          <span class="tag duration"><i class="fa-regular fa-clock"></i> {{ movie.duration }} phút</span>
         </div>
-        <span class="review-count">(12.5k reviews)</span>
-      </div>
+        
+        <div class="movie-rating-row">
+          <div class="rating-badge">
+            <i class="fa-solid fa-star"></i>
+            <span>{{ movie.rating }}</span>
+          </div>
+          <span class="review-count">Khởi chiếu: {{ movie.releaseDate | date:'dd/MM/yyyy' }}</span>
+        </div>
 
-      <p class="movie-synopsis">
-        Bộ phim xoay quanh câu chuyện đan xen giữa tình yêu và thù hận trong thời kỳ chiến tranh loạn lạc. Những con người bị cuốn vào vòng xoáy của lịch sử phải đưa ra những quyết định khó khăn để bảo vệ lẽ phải.
-      </p>
+        <p class="movie-synopsis">
+          Phim {{ movie.movieName }} thuộc thể loại {{ movie.genre }} bằng tiếng {{ movie.language }}. 
+        </p>
 
-      <div class="cast-section">
-        <h3>Đạo diễn & Diễn viên</h3>
-        <p><strong>Đạo diễn:</strong> Nguyễn Quang Dũng</p>
-        <p><strong>Diễn viên:</strong> Trấn Thành, Ninh Dương Lan Ngọc, Kiều Minh Tuấn...</p>
-      </div>
-
-      <div class="action-buttons">
-        <button class="book-now-btn" routerLink="/booking/1">
-          <i class="fa-solid fa-ticket"></i>
-          Mua vé ngay
-        </button>
-        <button class="favorite-btn-large">
-          <i class="fa-regular fa-heart"></i>
-        </button>
-      </div>
+        <div class="action-buttons">
+          <button class="book-now-btn" [routerLink]="['/booking', movie.id]">
+            <i class="fa-solid fa-ticket"></i>
+            Mua vé ngay
+          </button>
+          <button class="favorite-btn-large">
+            <i class="fa-regular fa-heart"></i>
+          </button>
+        </div>
+      } @else {
+        <h2>Movie not found.</h2>
+      }
     </div>
   </div>
 </div>

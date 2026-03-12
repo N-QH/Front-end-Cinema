@@ -2,43 +2,39 @@ import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MovieService } from '../services/movie.service';
+import { BookingService } from '../services/booking.service';
 
 @Component({
-  selector: 'app-admin',
+  selector: 'app-admin-theaters',
   imports: [RouterLink, CommonModule, FormsModule],
-  templateUrl: './admin.html',
-  styleUrl: './admin.css',
+  templateUrl: './admin-theaters.html',
+  styleUrl: '../admin/admin.css',
 })
-export class Admin implements OnInit {
+export class AdminTheaters implements OnInit {
   showAddModal = false;
   isLoading = false;
   isFetching = true;
   message: string | null = null;
   error: string | null = null;
   
-  movies: any[] = [];
+  theaters: any[] = [];
 
-  movieData = {
-    movieName: '',
-    duration: 120,
-    rating: 8.5,
-    releaseDate: '2026-10-12',
-    genre: 'ACTION',
-    language: 'ENGLISH'
+  theaterData = {
+    name: '',
+    address: ''
   };
 
-  constructor(private movieService: MovieService) {}
+  constructor(private bookingService: BookingService) {}
 
   ngOnInit() {
-    this.loadMovies();
+    this.loadTheaters();
   }
 
-  loadMovies() {
+  loadTheaters() {
     this.isFetching = true;
-    this.movieService.getMovies().subscribe({
+    this.bookingService.getTheaters().subscribe({
       next: (res) => {
-        this.movies = res;
+        this.theaters = res;
         this.isFetching = false;
       },
       error: () => this.isFetching = false
@@ -60,17 +56,30 @@ export class Admin implements OnInit {
     this.message = null;
     this.error = null;
 
-    this.movieService.addMovie(this.movieData).subscribe({
+    this.bookingService.addTheater(this.theaterData).subscribe({
       next: (res) => {
         this.isLoading = false;
-        this.message = 'Movie added successfully!';
-        this.loadMovies();
+        this.message = 'Thêm rạp thành công!';
+        this.loadTheaters();
         setTimeout(() => this.closeAddModal(), 1500);
       },
       error: (err) => {
         this.isLoading = false;
-        this.error = err.error || 'Failed to add movie';
+        this.error = err.error || 'Lỗi khi thêm rạp';
       }
     });
+  }
+
+  deleteTheater(id: number) {
+    if(confirm('Bạn có chắc chắn muốn xóa rạp này?')) {
+      this.bookingService.deleteTheater(id).subscribe({
+        next: () => {
+          this.loadTheaters();
+        },
+        error: (err) => {
+          alert('Không thể xóa rạp này.');
+        }
+      });
+    }
   }
 }

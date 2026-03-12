@@ -15,54 +15,53 @@
     </div>
 
     <div class="ticket-list">
-      <!-- A detailed ticket card example -->
-      <div class="ticket-stub-card">
-        <div class="ticket-visual">
-          <div class="movie-poster placeholder-poster">
-            <i class="fa-solid fa-image"></i>
-          </div>
-        </div>
+      @if (isLoading) {
+        <p style="text-align: center; color: var(--text-secondary); margin-top: 40px;">Đang tải danh sách vé...</p>
+      } @else if (tickets.length === 0) {
+        <p style="text-align: center; color: var(--text-secondary); margin-top: 40px;">Bạn chưa có vé nào. Hãy đặt vé ngay!</p>
+      } @else {
+        @for (ticket of tickets; track ticket.id) {
+          <div class="ticket-stub-card">
+            <div class="ticket-visual">
+              <div class="movie-poster placeholder-poster">
+                <i class="fa-solid fa-film"></i>
+              </div>
+            </div>
 
-        <div class="ticket-details">
-          <span class="status-badge valid">Sắp chiếu</span>
-          <h3 class="movie-title">Mưa đỏ</h3>
-          <p class="movie-type">2D Phụ đề Tiếng Việt</p>
-          
-          <div class="info-grid">
-            <div class="info-group">
-              <span class="label">Rạp</span>
-              <span class="value">CGV Vincom Center</span>
-            </div>
-            <div class="info-group">
-              <span class="label">Phòng chiếu</span>
-              <span class="value">CINEMA 5</span>
-            </div>
-            <div class="info-group">
-              <span class="label">Ngày</span>
-              <span class="value">12/10/2026</span>
-            </div>
-            <div class="info-group">
-              <span class="label">Giờ chiếu</span>
-              <span class="value">12:00</span>
-            </div>
-            <div class="info-group">
-              <span class="label">Ghế</span>
-              <span class="value seat-value">A7, A8</span>
-            </div>
-            <div class="info-group">
-              <span class="label">Mã đặt chỗ</span>
-              <span class="value codes">8AB29C</span>
-            </div>
-          </div>
-        </div>
+            <div class="ticket-details">
+              <span class="status-badge valid">Đã Đặt</span>
+              <h3 class="movie-title">Vé #{{ ticket.id }}</h3>
+              <p class="movie-type">ID Rạp: {{ ticket.theaterId }} • ID Suất Chiếu: {{ ticket.showId }}</p>
 
-        <div class="ticket-qr-section">
-          <div class="qr-code-placeholder">
-            <i class="fa-solid fa-qrcode"></i>
+              <div class="info-grid">
+                <div class="info-group">
+                  <span class="label">Ngày đặt</span>
+                  <span class="value">{{ ticket.ticketDate | date:'dd/MM/yyyy' }}</span>
+                </div>
+                <div class="info-group">
+                  <span class="label">Giờ đặt</span>
+                  <span class="value">{{ ticket.ticketTime | slice:0:5 }}</span>
+                </div>
+                <div class="info-group">
+                  <span class="label">Số vé</span>
+                  <span class="value">{{ ticket.noOfSeats }}</span>
+                </div>
+                <div class="info-group">
+                  <span class="label">Tổng tiền</span>
+                  <span class="value">{{ ticket.amount | number:'1.0-0' }}đ</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="ticket-qr-section">
+              <div class="qr-code-placeholder">
+                <i class="fa-solid fa-qrcode"></i>
+              </div>
+              <p class="instruction">Mã đặt chỗ: <br/><strong>{{ ticket.ticketId || ('TK' + ticket.id) }}</strong></p>
+            </div>
           </div>
-          <p class="instruction">Đưa mã này cho nhân viên soát vé</p>
-        </div>
-      </div>
+        }
+      }
     </div>
 
   </div>

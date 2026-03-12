@@ -7,16 +7,16 @@
     </div>
     
     <nav class="admin-nav">
-      <a href="#" class="nav-item active">
+      <a href="#" class="nav-item" routerLink="/admin">
         <i class="fa-solid fa-chart-line"></i> Dashboard
       </a>
-      <a href="#" class="nav-item">
+      <a href="#" class="nav-item" routerLink="/admin">
         <i class="fa-solid fa-video"></i> Quản lý Phim
       </a>
       <a href="#" class="nav-item" routerLink="/admin/theaters">
         <i class="fa-solid fa-building"></i> Quản lý Rạp
       </a>
-      <a href="#" class="nav-item" routerLink="/admin/shows">
+      <a href="#" class="nav-item active" routerLink="/admin/shows">
         <i class="fa-solid fa-calendar-alt"></i> Lịch chiếu
       </a>
       <a href="#" class="nav-item">
@@ -38,7 +38,7 @@
     <header class="admin-header">
       <div class="header-search">
         <i class="fa-solid fa-search"></i>
-        <input type="text" placeholder="Tìm kiếm..." />
+        <input type="text" placeholder="Tìm kiếm rạp..." />
       </div>
       <div class="header-actions">
         <button class="icon-btn"><i class="fa-regular fa-bell"></i></button>
@@ -51,50 +51,19 @@
 
     <div class="admin-content">
       <div class="page-header">
-        <h2>Quản lý Phim</h2>
-        <button class="primary-btn" (click)="openAddModal()"><i class="fa-solid fa-plus"></i> Thêm phim mới</button>
-      </div>
-
-      <div class="stats-cards">
-        <div class="stat-card">
-          <div class="stat-icon pulse"><i class="fa-solid fa-ticket"></i></div>
-          <div class="stat-info">
-            <span class="stat-label">Vé bán hôm nay</span>
-            <span class="stat-value">1,245</span>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon purple"><i class="fa-solid fa-video"></i></div>
-          <div class="stat-info">
-            <span class="stat-label">Phim đang chiếu</span>
-            <span class="stat-value">24</span>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon green"><i class="fa-solid fa-dollar-sign"></i></div>
-          <div class="stat-info">
-            <span class="stat-label">Doanh thu (Ngày)</span>
-            <span class="stat-value">124.5M ₫</span>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon blue"><i class="fa-solid fa-users"></i></div>
-          <div class="stat-info">
-            <span class="stat-label">Người dùng mới</span>
-            <span class="stat-value">+145</span>
-          </div>
-        </div>
+        <h2>Quản lý Lịch chiếu</h2>
+        <button class="primary-btn" (click)="openAddModal()"><i class="fa-solid fa-plus"></i> Thêm lịch chiếu</button>
       </div>
 
       <div class="content-table-wrapper">
         <table class="admin-table">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Tên Phim</th>
-              <th>Thể loại</th>
-              <th>Thời lượng</th>
-              <th>Trạng thái</th>
+              <th>ID Suất</th>
+              <th>Ngày chiếu</th>
+              <th>Giờ chiếu</th>
+              <th>Phim</th>
+              <th>Rạp</th>
               <th>Hành động</th>
             </tr>
           </thead>
@@ -103,21 +72,20 @@
               <tr>
                 <td colspan="6" style="text-align: center; padding: 20px;">Đang tải dữ liệu...</td>
               </tr>
-            } @else if (movies.length === 0) {
+            } @else if (shows.length === 0) {
               <tr>
-                <td colspan="6" style="text-align: center; padding: 20px;">Chưa có phim nào.</td>
+                <td colspan="6" style="text-align: center; padding: 20px;">Chưa có lịch chiếu nào.</td>
               </tr>
             } @else {
-              @for (movie of movies; track movie.id) {
+              @for (show of shows; track show.id) {
                 <tr>
-                  <td>#{{ movie.id }}</td>
-                  <td>{{ movie.movieName }}</td>
-                  <td>{{ movie.genre }}</td>
-                  <td>{{ movie.duration }} phút</td>
-                  <td><span class="status-badge valid">Đang chiếu</span></td>
+                  <td>#{{ show.id }}</td>
+                  <td>{{ show.showDate | date:'dd/MM/yyyy' }}</td>
+                  <td>{{ show.showTime }}</td>
+                  <td>{{ getMovieName(show.movieId) }}</td>
+                  <td>{{ getTheaterName(show.theaterId) }}</td>
                   <td>
-                    <button class="action-btn edit"><i class="fa-solid fa-pen"></i></button>
-                    <button class="action-btn delete"><i class="fa-solid fa-trash"></i></button>
+                    <button class="action-btn delete" (click)="deleteShow(show.id)"><i class="fa-solid fa-trash"></i></button>
                   </td>
                 </tr>
               }
@@ -133,7 +101,7 @@
 <div class="modal-overlay">
   <div class="modal-content">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-      <h3 style="margin: 0; font-size: 20px;">Thêm Phim Mới</h3>
+      <h3 style="margin: 0; font-size: 20px;">Thêm Lịch Chiếu</h3>
       <button style="background: none; border: none; font-size: 20px; cursor: pointer;" (click)="closeAddModal()">&times;</button>
     </div>
     
@@ -149,35 +117,48 @@
     }
 
     <form (ngSubmit)="onSubmit()">
-      <div style="margin-bottom: 16px;">
-        <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px;">Tên Phim</label>
-        <input type="text" [(ngModel)]="movieData.movieName" name="movieName" required
-          style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit;">
-      </div>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
         <div>
-          <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px;">Thời lượng (phút)</label>
-          <input type="number" [(ngModel)]="movieData.duration" name="duration" required
+          <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px;">Ngày chiếu</label>
+          <input type="date" [(ngModel)]="showData.showDate" name="showDate" required
             style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit;">
         </div>
         <div>
-          <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px;">Đánh giá</label>
-          <input type="number" step="0.1" [(ngModel)]="movieData.rating" name="rating" required 
+          <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px;">Giờ chiếu</label>
+          <input type="time" [(ngModel)]="showData.showTime" name="showTime" required step="60"
             style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit;">
         </div>
       </div>
-      <div style="margin-bottom: 24px;">
-        <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px;">Ngày khởi chiếu</label>
-        <input type="date" [(ngModel)]="movieData.releaseDate" name="releaseDate" required
-          style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit;">
+      
+      <div style="margin-bottom: 16px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px;">Chọn Phim</label>
+        <select [(ngModel)]="showData.movieId" name="movieId" required
+          style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit; background: white;">
+          <option [ngValue]="null">-- Chọn phim --</option>
+          @for (movie of movies; track movie.id) {
+            <option [ngValue]="movie.id">{{ movie.movieName }}</option>
+          }
+        </select>
       </div>
+
+      <div style="margin-bottom: 24px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px;">Chọn Rạp</label>
+        <select [(ngModel)]="showData.theaterId" name="theaterId" required
+          style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit; background: white;">
+          <option [ngValue]="null">-- Chọn rạp --</option>
+          @for (theater of theaters; track theater.id) {
+            <option [ngValue]="theater.id">{{ theater.name }}</option>
+          }
+        </select>
+      </div>
+
       <div style="display: flex; gap: 12px; justify-content: flex-end;">
         <button type="button" (click)="closeAddModal()" 
           style="padding: 10px 20px; border-radius: 8px; border: 1px solid var(--border-color); background: white; cursor: pointer; font-weight: 500;">
           Hủy
         </button>
         <button type="submit" [disabled]="isLoading" class="primary-btn" style="border: none;">
-          {{ isLoading ? 'Đang thêm...' : 'Lưu Phim' }}
+          {{ isLoading ? 'Đang thêm...' : 'Lưu Lịch Chiếu' }}
         </button>
       </div>
     </form>

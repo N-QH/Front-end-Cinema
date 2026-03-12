@@ -1,0 +1,58 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <button class="back-btn" routerLink="/">
+      <i class="fa-solid fa-arrow-left"></i> Trang chủ
+    </button>
+    <h2>Hồ sơ của tôi</h2>
+    <div class="header-placeholder"></div>
+  </div>
+
+  <div class="profile-content">
+    @if (isLoading) {
+      <div style="text-align: center; padding: 40px; color: var(--text-secondary);">Đang tải thông tin...</div>
+    } @else {
+      <div class="profile-card">
+        
+        <div class="profile-avatar-section">
+          <img [src]="userProfile.userImage || 'https://ui-avatars.com/api/?name=' + userProfile.name + '&background=7c3aed&color=fff'" alt="Avatar" class="profile-avatar" />
+          <h3 class="profile-name">{{ userProfile.name }}</h3>
+          <p class="profile-role">Khách hàng | ID: {{ userProfile.id }}</p>
+        </div>
+
+        <form (ngSubmit)="onSubmit()" class="profile-form">
+          <div class="form-group">
+            <label>Họ và Tên</label>
+            <input type="text" [(ngModel)]="userProfile.name" name="name" required class="form-input">
+          </div>
+          
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" [(ngModel)]="userProfile.emailId" name="emailId" required class="form-input">
+          </div>
+
+          <div class="form-group">
+            <label>Số điện thoại</label>
+            <input type="tel" [(ngModel)]="userProfile.mobileNo" name="mobile" required class="form-input">
+          </div>
+
+          <div class="form-group">
+            <label>Mật khẩu mới (Bỏ trống nếu không đổi)</label>
+            <input type="password" [(ngModel)]="newPassword" name="newPassword" class="form-input" placeholder="Nhập phần mật khẩu muốn đổi">
+          </div>
+          
+          <div class="form-group">
+            <label>Ảnh đại diện (URL)</label>
+            <input type="text" [(ngModel)]="userProfile.userImage" name="userImage" class="form-input" placeholder="https://...">
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" [disabled]="isSaving" class="primary-btn submit-btn">
+              {{ isSaving ? 'Đang lưu...' : 'Lưu Thay Đổi' }}
+            </button>
+          </div>
+        </form>
+
+      </div>
+    }
+  </div>
+</div>
