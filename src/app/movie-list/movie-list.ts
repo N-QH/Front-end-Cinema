@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MovieItem } from '../movie-item/movie-item';
 import { Pagination } from '../pagination/pagination';
@@ -14,16 +14,20 @@ export class MovieList implements OnInit {
   movies: any[] = [];
   isLoading = true;
 
-  constructor(private movieService: MovieService) {}
+  constructor(private movieService: MovieService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.movieService.getMovies().subscribe({
       next: (data) => {
-        // Just show all movies on the home page, or limit to 8
         this.movies = data.slice(0, 8); 
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
-      error: () => this.isLoading = false
+      error: () => {
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 }
+

@@ -38,7 +38,7 @@
     <header class="admin-header">
       <div class="header-search">
         <i class="fa-solid fa-search"></i>
-        <input type="text" placeholder="Tìm kiếm rạp..." />
+        <input type="text" placeholder="Tìm kiếm lịch chiếu..." />
       </div>
       <div class="header-actions">
         <button class="icon-btn"><i class="fa-regular fa-bell"></i></button>
@@ -59,7 +59,7 @@
         <table class="admin-table">
           <thead>
             <tr>
-              <th>ID Suất</th>
+              <th>ID</th>
               <th>Ngày chiếu</th>
               <th>Giờ chiếu</th>
               <th>Phim</th>
@@ -77,15 +77,20 @@
                 <td colspan="6" style="text-align: center; padding: 20px;">Chưa có lịch chiếu nào.</td>
               </tr>
             } @else {
-              @for (show of shows; track show.id) {
+              @for (show of shows; track show.showId || show.id) {
                 <tr>
-                  <td>#{{ show.id }}</td>
-                  <td>{{ show.showDate | date:'dd/MM/yyyy' }}</td>
-                  <td>{{ show.showTime }}</td>
-                  <td>{{ getMovieName(show.movieId) }}</td>
-                  <td>{{ getTheaterName(show.theaterId) }}</td>
+                  <td>#{{ show.showId || show.id }}</td>
+                  <td>{{ show.date | date:'dd/MM/yyyy' }}</td>
+                  <td>{{ show.time }}</td>
+                  <td>{{ show.movie?.movieName || 'N/A' }}</td>
+                  <td>{{ show.theater?.name || 'N/A' }}</td>
                   <td>
-                    <button class="action-btn delete" (click)="deleteShow(show.id)"><i class="fa-solid fa-trash"></i></button>
+                    <button class="action-btn edit" title="Chỉnh sửa ghế" (click)="openSeatEditor(show)" style="margin-right: 8px;">
+                      <i class="fa-solid fa-chair"></i>
+                    </button>
+                    <button class="action-btn delete" title="Xóa" (click)="deleteShow(show.showId || show.id)">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
                   </td>
                 </tr>
               }
@@ -98,42 +103,28 @@
 </div>
 
 @if (showAddModal) {
-<div class="modal-overlay">
-  <div class="modal-content">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-      <h3 style="margin: 0; font-size: 20px;">Thêm Lịch Chiếu</h3>
-      <button style="background: none; border: none; font-size: 20px; cursor: pointer;" (click)="closeAddModal()">&times;</button>
+<div class="modal-overlay" (click)="closeAddModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Thêm Lịch Chiếu</h3>
+      <button class="modal-close-btn" (click)="closeAddModal()">&times;</button>
     </div>
-    
-    @if (message) {
-      <div style="padding: 12px; background: #dcfce7; color: #166534; border-radius: 8px; margin-bottom: 16px;">
-        <i class="fa-solid fa-check-circle"></i> {{ message }}
-      </div>
-    }
-    @if (error) {
-      <div style="padding: 12px; background: #fee2e2; color: #991b1b; border-radius: 8px; margin-bottom: 16px;">
-        <i class="fa-solid fa-triangle-exclamation"></i> {{ error }}
-      </div>
-    }
 
     <form (ngSubmit)="onSubmit()">
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
-        <div>
-          <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px;">Ngày chiếu</label>
-          <input type="date" [(ngModel)]="showData.showDate" name="showDate" required
-            style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit;">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Ngày chiếu</label>
+          <input type="date" class="form-input" [(ngModel)]="showData.showDate" name="showDate" required>
         </div>
-        <div>
-          <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px;">Giờ chiếu</label>
-          <input type="time" [(ngModel)]="showData.showTime" name="showTime" required step="60"
-            style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit;">
+        <div class="form-group">
+          <label class="form-label">Giờ chiếu</label>
+          <input type="time" class="form-input" [(ngModel)]="showData.showStartTime" name="showStartTime" required step="60">
         </div>
       </div>
       
-      <div style="margin-bottom: 16px;">
-        <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px;">Chọn Phim</label>
-        <select [(ngModel)]="showData.movieId" name="movieId" required
-          style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit; background: white;">
+      <div class="form-group">
+        <label class="form-label">Chọn Phim</label>
+        <select class="form-select" [(ngModel)]="showData.movieId" name="movieId" required>
           <option [ngValue]="null">-- Chọn phim --</option>
           @for (movie of movies; track movie.id) {
             <option [ngValue]="movie.id">{{ movie.movieName }}</option>
@@ -141,10 +132,9 @@
         </select>
       </div>
 
-      <div style="margin-bottom: 24px;">
-        <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px;">Chọn Rạp</label>
-        <select [(ngModel)]="showData.theaterId" name="theaterId" required
-          style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit; background: white;">
+      <div class="form-group">
+        <label class="form-label">Chọn Rạp</label>
+        <select class="form-select" [(ngModel)]="showData.theaterId" name="theaterId" required>
           <option [ngValue]="null">-- Chọn rạp --</option>
           @for (theater of theaters; track theater.id) {
             <option [ngValue]="theater.id">{{ theater.name }}</option>
@@ -152,16 +142,78 @@
         </select>
       </div>
 
-      <div style="display: flex; gap: 12px; justify-content: flex-end;">
-        <button type="button" (click)="closeAddModal()" 
-          style="padding: 10px 20px; border-radius: 8px; border: 1px solid var(--border-color); background: white; cursor: pointer; font-weight: 500;">
-          Hủy
-        </button>
+      <div style="margin-top: 20px; padding: 16px; background: rgba(16, 185, 129, 0.05); border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.15);">
+        <h4 style="margin: 0 0 16px 0; font-size: 15px; color: #059669; display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-tags"></i> Bảng giá vé khởi tạo
+        </h4>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Giá ghế VIP (₫)</label>
+            <input type="number" class="form-input" [(ngModel)]="seatPricing.priceOfPremiumSeat" name="priceOfPremiumSeat" min="0" step="1000" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Giá ghế Thường (₫)</label>
+            <input type="number" class="form-input" [(ngModel)]="seatPricing.priceOfClassicSeat" name="priceOfClassicSeat" min="0" step="1000" required>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions" style="margin-top: 24px;">
+        <button type="button" (click)="closeAddModal()" class="form-btn-cancel">Hủy</button>
         <button type="submit" [disabled]="isLoading" class="primary-btn" style="border: none;">
           {{ isLoading ? 'Đang thêm...' : 'Lưu Lịch Chiếu' }}
         </button>
       </div>
     </form>
+  </div>
+</div>
+}
+
+<!-- Seat Editor Modal for Individual Show -->
+@if (showSeatEditor) {
+<div class="modal-overlay" (click)="closeSeatEditor()">
+  <div class="modal-content" (click)="$event.stopPropagation()" style="width: 800px; max-width: 95vw;">
+    <div class="modal-header">
+      <h3>Thiết kế Sơ đồ ghế cho Suất chiếu #{{ selectedShow?.showId || selectedShow?.id }}</h3>
+      <button class="modal-close-btn" (click)="closeSeatEditor()">&times;</button>
+    </div>
+
+    <div style="margin-bottom: 24px; padding: 16px; background: #fffbeb; border-radius: 12px; border: 1px solid #fef3c7;">
+      <p style="margin: 0; font-size: 14px; color: #92400e;">
+        <i class="fa-solid fa-triangle-exclamation"></i> Chỉnh sửa tại đây chỉ áp dụng cho <strong>Suất chiếu này</strong>.
+      </p>
+    </div>
+
+    <div style="background: #1e293b; padding: 40px 20px; border-radius: 16px; margin-bottom: 24px; display: flex; flex-direction: column; align-items: center; overflow-x: auto;">
+      <div style="width: 400px; height: 4px; background: #94a3b8; border-radius: 4px; box-shadow: 0 4px 20px rgba(255,255,255,0.2); margin-bottom: 40px; text-align: center;">
+        <span style="color: #94a3b8; font-size: 10px; letter-spacing: 4px; position: relative; top: 12px;">MÀN HÌNH</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        @for (row of seatRows; track row) {
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="color: #64748b; font-weight: bold; width: 20px; font-size: 12px;">{{ row }}</span>
+            @for (seat of getSeatsForRow(row); track seat.id) {
+              <button 
+                (click)="toggleSeatType(seat)"
+                style="width: 30px; height: 30px; border-radius: 6px; cursor: pointer; border: 2px solid; transition: all 0.2s;"
+                [style.background-color]="seat.seatType === 'PREMIUM' ? '#fef3c7' : '#f3f4f6'"
+                [style.border-color]="seat.seatType === 'PREMIUM' ? '#fcd34d' : '#d1d5db'"
+                [title]="seat.seatNo + ' - ' + formatPrice(seat.price)"
+              ></button>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" (click)="closeSeatEditor()" class="form-btn-cancel">Hủy</button>
+      <button type="button" (click)="saveSeatChanges()" [disabled]="savingSeats" class="primary-btn" style="border: none;">
+        {{ savingSeats ? 'Đang lưu...' : 'Lưu sơ đồ ghế' }}
+      </button>
+    </div>
   </div>
 </div>
 }

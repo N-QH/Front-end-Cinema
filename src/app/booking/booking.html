@@ -1,6 +1,6 @@
 <div class="booking-container">
   <div class="booking-header">
-    <button class="back-btn" routerLink="/movie/1">
+    <button class="back-btn" [routerLink]="movieId ? ['/movie', movieId] : ['/']">
       <i class="fa-solid fa-arrow-left"></i> Quay lại
     </button>
     <h2>Chọn ghế & Rạp chiếu</h2>
@@ -27,14 +27,13 @@
           @if (shows.length === 0) {
             <p style="color: var(--text-secondary); font-size: 14px;">Không có suất chiếu nào cho rạp này.</p>
           } @else {
-            @for (show of shows; track show.id) {
-              <!-- Ideally, we should filter by selectedTheaterId but the mock structure holds flat lists. Let's just list shows for the movie -->
+            @for (show of shows; track show.showId || show.id) {
               <button 
                 class="time-btn" 
-                [class.active]="selectedShowId === show.id"
-                (click)="selectedShowId = show.id"
+                [class.active]="selectedShowId === (show.showId || show.id)"
+                (click)="selectShow(show)"
               >
-                {{ show.showTime }} <br/><small style="font-size: 11px;">{{ show.showDate | date:'dd/MM' }}</small>
+                {{ show.time }} <br/><small style="font-size: 11px;">{{ show.date | date:'dd/MM' }}</small>
               </button>
             }
           }
@@ -51,21 +50,28 @@
         <span class="screen-text">MÀN HÌNH</span>
       </div>
       
-      <div class="seat-grid">
-        <!-- Render seats -->
-        @for (row of ['A', 'B', 'C']; track row) {
-          <div class="seat-row">
-            <span class="row-label">{{ row }}</span>
-            @for (num of [1,2,3,4,5,6,7,8,9,10]; track num) {
-              <button 
-                class="seat" 
-                [class.selected]="isSeatSelected(row + num)"
-                (click)="toggleSeat(row + num)"
-              ></button>
-            }
-          </div>
-        }
-      </div>
+      @if (selectedShowId) {
+        <div class="seat-grid">
+          @for (row of seatRows; track row) {
+            <div class="seat-row">
+              <span class="row-label">{{ row }}</span>
+              @for (seat of getSeatsForRow(row); track seat.id) {
+                <button 
+                  [class]="getSeatClass(seat)"
+                  [disabled]="seat.occupied"
+                  (click)="toggleSeat(seat)"
+                  [title]="seat.seatNo + ' - ' + (seat.type === 'PREMIUM' ? 'VIP' : 'Thường') + ' - ' + formatPrice(seat.price) + 'đ'"
+                ></button>
+              }
+            </div>
+          }
+        </div>
+      } @else {
+        <div style="margin: 40px 0; text-align: center; color: var(--text-muted);">
+          <i class="fa-solid fa-chair" style="font-size: 48px; display: block; margin-bottom: 16px; opacity: 0.2;"></i>
+          Vui lòng chọn suất chiếu để xem sơ đồ ghế
+        </div>
+      }
       
       <div class="seat-legend">
         <div class="legend-item"><span class="seat-icon"></span> Thường</div>
@@ -91,10 +97,10 @@
       </div>
       <div class="summary-info">
         <span class="summary-label">Tổng tiền:</span>
-        <span class="summary-value total-price">{{ totalPrice | number:'1.0-0' }}đ</span>
+        <span class="summary-value total-price">{{ formatPrice(totalPrice) }}đ</span>
       </div>
     </div>
-    <button class="continue-btn" (click)="onBook()" [disabled]="!selectedTheaterId || !selectedShowId || selectedSeats.length === 0">
+    <button class="continue-btn" (click)="onBook()" [disabled]="!selectedShowId || selectedSeats.length === 0">
       Tiếp tục thanh toán
     </button>
   </div>

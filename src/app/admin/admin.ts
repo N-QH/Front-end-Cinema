@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MovieService } from '../services/movie.service';
+import { ToastService } from '../services/toast.service';
 
 @Component({
   selector: 'app-admin',
@@ -25,10 +26,12 @@ export class Admin implements OnInit {
     rating: 8.5,
     releaseDate: '2026-10-12',
     genre: 'ACTION',
-    language: 'ENGLISH'
+    language: 'ENGLISH',
+    description: '',
+    movieImage: ''
   };
 
-  constructor(private movieService: MovieService) {}
+  constructor(private movieService: MovieService, private cdr: ChangeDetectorRef, private toastService: ToastService) {}
 
   ngOnInit() {
     this.loadMovies();
@@ -40,8 +43,12 @@ export class Admin implements OnInit {
       next: (res) => {
         this.movies = res;
         this.isFetching = false;
+        this.cdr.detectChanges();
       },
-      error: () => this.isFetching = false
+      error: () => {
+        this.isFetching = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -63,14 +70,31 @@ export class Admin implements OnInit {
     this.movieService.addMovie(this.movieData).subscribe({
       next: (res) => {
         this.isLoading = false;
-        this.message = 'Movie added successfully!';
+        this.toastService.showSuccess('Thêm phim thành công!');
+        this.resetForm();
         this.loadMovies();
-        setTimeout(() => this.closeAddModal(), 1500);
+        this.closeAddModal();
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.isLoading = false;
-        this.error = err.error || 'Failed to add movie';
+        this.error = err.error || 'Thêm phim thất bại';
+        this.toastService.showError(this.error!);
+        this.cdr.detectChanges();
       }
     });
+  }
+
+  resetForm() {
+    this.movieData = {
+      movieName: '',
+      duration: 120,
+      rating: 8.5,
+      releaseDate: '2026-10-12',
+      genre: 'ACTION',
+      language: 'ENGLISH',
+      description: '',
+      movieImage: ''
+    };
   }
 }

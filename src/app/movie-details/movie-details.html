@@ -34,7 +34,7 @@
         </div>
 
         <p class="movie-synopsis">
-          Phim {{ movie.movieName }} thuộc thể loại {{ movie.genre }} bằng tiếng {{ movie.language }}. 
+          {{ movie.description || ('Phim ' + movie.movieName + ' thuộc thể loại ' + movie.genre + ' bằng tiếng ' + movie.language + '.') }}
         </p>
 
         <div class="action-buttons">

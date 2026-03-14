@@ -5,6 +5,8 @@
     } @else {
       @for (movie of movies; track movie.id) {
         <app-movie-item [movie]="movie"></app-movie-item>
+      } @empty {
+        <div class="empty-state">Hiện chưa có phim nào khởi chiếu.</div>
       }
     }
   </div>

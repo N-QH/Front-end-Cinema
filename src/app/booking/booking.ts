@@ -1,8 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { BookingService } from '../services/booking.service';
+import { AuthService } from '../services/auth.service';
 import { FormsModule } from '@angular/forms';
+
+interface SeatInfo {
+  id: number;
+  seatNo: string;
+  type: string;
+  price: number;
+  occupied: boolean;
+}
 
 @Component({
   selector: 'app-booking',
@@ -18,13 +27,18 @@ export class Booking implements OnInit {
   selectedTheaterId: number | null = null;
   selectedShowId: number | null = null;
   
-  // Dummy seats for now
-  selectedSeats: string[] = [];
+  seats: SeatInfo[] = [];
+  seatRows: string[] = [];
+  selectedSeats: string[] = []; // Store seatNo for display
+  selectedSeatNos: string[] = []; // Redundant but keeping consistent
   totalPrice = 0;
+  userId: number = 1;
 
   constructor(
     private route: ActivatedRoute,
-    private bookingService: BookingService
+    private bookingService: BookingService,
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -33,60 +47,126 @@ export class Booking implements OnInit {
       this.movieId = +id;
       this.loadBookingData();
     }
+    this.fetchCurrentUser();
+  }
+
+  fetchCurrentUser() {
+    const email = this.authService.getUserEmail();
+    if (email) {
+      this.authService.getUserByEmail(email).subscribe(user => {
+        if (user && user.userId) {
+          this.userId = user.userId;
+        }
+      });
+    }
   }
 
   loadBookingData() {
     this.bookingService.getTheaters().subscribe(res => {
       this.theaters = res;
       if (this.theaters.length > 0) this.selectedTheaterId = this.theaters[0].id;
+      this.cdr.detectChanges();
     });
 
     if (this.movieId) {
       this.bookingService.getShowsByMovieId(this.movieId).subscribe(res => {
         this.shows = res;
+        this.cdr.detectChanges();
       });
     }
   }
 
-  toggleSeat(seatId: string) {
-    const index = this.selectedSeats.indexOf(seatId);
-    if (index > -1) {
-      this.selectedSeats.splice(index, 1);
-      this.totalPrice -= 90000; // Base price
-    } else {
-      this.selectedSeats.push(seatId);
-      this.totalPrice += 90000;
+  selectShow(show: any) {
+    this.selectedShowId = show.showId || show.id;
+    this.selectedSeats = [];
+    this.totalPrice = 0;
+    
+    // Load seats for this show
+    if (show.showSeatList) {
+      this.seats = show.showSeatList.map((s: any) => ({
+        id: s.id,
+        seatNo: s.seatNo,
+        type: s.seatType,
+        price: s.price,
+        occupied: !s.isAvailable
+      }));
+      
+      // Organize into rows
+      const rowsSet = new Set<string>();
+      this.seats.forEach(s => {
+        const rowMatch = s.seatNo.match(/[A-Z]+/);
+        if (rowMatch) rowsSet.add(rowMatch[0]);
+      });
+      this.seatRows = Array.from(rowsSet).sort();
     }
+    this.cdr.detectChanges();
   }
 
-  isSeatSelected(seatId: string): boolean {
-    return this.selectedSeats.includes(seatId);
+  getSeatsForRow(row: string): SeatInfo[] {
+    return this.seats.filter(s => s.seatNo.startsWith(row));
+  }
+
+  toggleSeat(seat: SeatInfo) {
+    if (seat.occupied) return;
+
+    const index = this.selectedSeats.indexOf(seat.seatNo);
+    if (index > -1) {
+      this.selectedSeats.splice(index, 1);
+      this.totalPrice -= seat.price;
+    } else {
+      this.selectedSeats.push(seat.seatNo);
+      this.totalPrice += seat.price;
+    }
+    this.cdr.detectChanges();
+  }
+
+  isSeatSelected(seatNo: string): boolean {
+    return this.selectedSeats.includes(seatNo);
+  }
+
+  getSeatClass(seat: SeatInfo): string {
+    let classes = 'seat';
+    if (seat.type === 'PREMIUM') classes += ' vip';
+    if (seat.occupied) classes += ' occupied';
+    if (this.isSeatSelected(seat.seatNo)) classes += ' selected';
+    return classes;
+  }
+
+  formatPrice(price: number): string {
+    return new Intl.NumberFormat('vi-VN').format(price);
   }
 
   onBook() {
-    if (!this.selectedTheaterId || !this.selectedShowId || this.selectedSeats.length === 0) {
-      alert("Vui lòng chọn rạp, suất chiếu và ghế ngồi!");
+    if (!this.selectedShowId || this.selectedSeats.length === 0) {
+      alert("Vui lòng chọn suất chiếu và ghế ngồi!");
       return;
     }
 
     const payload = {
-      amount: this.totalPrice,
-      noOfSeats: this.selectedSeats.length,
-      userId: 1, // Assuming logged in as user 1 for now, optionally decode JWT
       showId: this.selectedShowId,
-      theaterId: this.selectedTheaterId,
-      bookSeats: this.selectedSeats
+      userId: this.userId,
+      requestSeats: this.selectedSeats
     };
 
     this.bookingService.bookTicket(payload).subscribe({
       next: (res) => {
-        alert("Booking successful!");
+        alert("Đặt vé thành công!");
         this.selectedSeats = [];
         this.totalPrice = 0;
+        // Refresh show data to update seat occupancy
+        if (this.movieId) {
+          this.bookingService.getShowsByMovieId(this.movieId).subscribe(shows => {
+            this.shows = shows;
+            const updatedShow = shows.find((s: any) => (s.showId || s.id) === this.selectedShowId);
+            if (updatedShow) this.selectShow(updatedShow);
+            this.cdr.detectChanges();
+          });
+        }
       },
       error: (err) => {
-        alert("Failed to book tickets. Please try again.");
+        alert("Đặt vé thất bại: " + (err.error || "Lỗi máy chủ"));
       }
     });
   }
 }
+

@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BookingService } from '../services/booking.service';
+import { ToastService } from '../services/toast.service';
 
 @Component({
   selector: 'app-admin-theaters',
@@ -12,19 +13,32 @@ import { BookingService } from '../services/booking.service';
 })
 export class AdminTheaters implements OnInit {
   showAddModal = false;
+  showSeatEditor = false;
   isLoading = false;
   isFetching = true;
-  message: string | null = null;
-  error: string | null = null;
+  savingSeats = false;
   
   theaters: any[] = [];
+  selectedTheater: any = null;
+  selectedTheaterSeats: any[] = [];
+  seatRows: string[] = [];
 
   theaterData = {
     name: '',
     address: ''
   };
 
-  constructor(private bookingService: BookingService) {}
+  seatData = {
+    noOfSeatInRow: 10,
+    noOfPremiumSeat: 20,
+    noOfClassicSeat: 60
+  };
+
+  constructor(
+    private bookingService: BookingService,
+    private toastService: ToastService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
     this.loadTheaters();
@@ -36,48 +50,131 @@ export class AdminTheaters implements OnInit {
       next: (res) => {
         this.theaters = res;
         this.isFetching = false;
+        this.cdr.detectChanges();
       },
-      error: () => this.isFetching = false
+      error: () => {
+        this.isFetching = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 
   openAddModal() {
     this.showAddModal = true;
-    this.message = null;
-    this.error = null;
   }
 
   closeAddModal() {
     this.showAddModal = false;
   }
 
-  onSubmit() {
-    this.isLoading = true;
-    this.message = null;
-    this.error = null;
+  openSeatEditor(theater: any) {
+    this.selectedTheater = theater;
+    this.selectedTheaterSeats = JSON.parse(JSON.stringify(theater.theaterSeatList || []));
+    this.organizeSeats();
+    this.showSeatEditor = true;
+    this.cdr.detectChanges();
+  }
 
-    this.bookingService.addTheater(this.theaterData).subscribe({
-      next: (res) => {
-        this.isLoading = false;
-        this.message = 'Thêm rạp thành công!';
-        this.loadTheaters();
-        setTimeout(() => this.closeAddModal(), 1500);
+  closeSeatEditor() {
+    this.showSeatEditor = false;
+    this.selectedTheater = null;
+    this.selectedTheaterSeats = [];
+  }
+
+  organizeSeats() {
+    const rowsSet = new Set<string>();
+    this.selectedTheaterSeats.forEach(s => {
+      const rowMatch = s.seatNo.match(/[A-Z]+/);
+      if (rowMatch) rowsSet.add(rowMatch[0]);
+    });
+    this.seatRows = Array.from(rowsSet).sort();
+  }
+
+  getSeatsForRow(row: string) {
+    return this.selectedTheaterSeats.filter(s => s.seatNo.startsWith(row));
+  }
+
+  toggleSeatType(seat: any) {
+    seat.seatType = seat.seatType === 'CLASSIC' ? 'PREMIUM' : 'CLASSIC';
+    this.cdr.detectChanges();
+  }
+
+  saveSeatChanges() {
+    if (!this.selectedTheater) return;
+    this.savingSeats = true;
+    this.bookingService.updateTheaterSeats(this.selectedTheater.id, this.selectedTheaterSeats).subscribe({
+      next: (updatedSeats) => {
+        this.savingSeats = false;
+        this.toastService.showSuccess('Cập nhật sơ đồ ghế thành công!');
+        // Update local data
+        this.selectedTheater.theaterSeatList = updatedSeats;
+        this.closeSeatEditor();
+        this.cdr.detectChanges();
       },
       error: (err) => {
-        this.isLoading = false;
-        this.error = err.error || 'Lỗi khi thêm rạp';
+        this.savingSeats = false;
+        this.toastService.showError('Lỗi cập nhật sơ đồ ghế: ' + (err.error || ''));
       }
     });
   }
 
+  get totalSeats(): number {
+    return this.seatData.noOfPremiumSeat + this.seatData.noOfClassicSeat;
+  }
+
+  onSubmit() {
+    this.isLoading = true;
+
+    this.bookingService.addTheater(this.theaterData).subscribe({
+      next: () => {
+        // After theater is created, add seats using address as key
+        const seatRequest = {
+          address: this.theaterData.address,
+          noOfSeatInRow: this.seatData.noOfSeatInRow,
+          noOfPremiumSeat: this.seatData.noOfPremiumSeat,
+          noOfClassicSeat: this.seatData.noOfClassicSeat
+        };
+
+        this.bookingService.addTheaterSeat(seatRequest).subscribe({
+          next: () => {
+            this.isLoading = false;
+            this.toastService.showSuccess('Thêm rạp và cấu hình ghế thành công!');
+            this.resetForm();
+            this.loadTheaters();
+            this.closeAddModal();
+            this.cdr.detectChanges();
+          },
+          error: (err) => {
+            this.isLoading = false;
+            this.toastService.showError('Thêm rạp thành công nhưng lỗi cấu hình ghế: ' + (err.error || ''));
+            this.loadTheaters();
+            this.closeAddModal();
+            this.cdr.detectChanges();
+          }
+        });
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.toastService.showError(err.error || 'Lỗi khi thêm rạp');
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  resetForm() {
+    this.theaterData = { name: '', address: '' };
+    this.seatData = { noOfSeatInRow: 10, noOfPremiumSeat: 20, noOfClassicSeat: 60 };
+  }
+
   deleteTheater(id: number) {
-    if(confirm('Bạn có chắc chắn muốn xóa rạp này?')) {
+    if (confirm('Bạn có chắc chắn muốn xóa rạp này?')) {
       this.bookingService.deleteTheater(id).subscribe({
         next: () => {
+          this.toastService.showSuccess('Đã xóa rạp thành công!');
           this.loadTheaters();
         },
-        error: (err) => {
-          alert('Không thể xóa rạp này.');
+        error: () => {
+          this.toastService.showError('Không thể xóa rạp này.');
         }
       });
     }

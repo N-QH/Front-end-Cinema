@@ -15,6 +15,10 @@ export class BookingService {
     return this.http.get<any[]>(`${this.apiUrl}/theater/all`);
   }
 
+  getTheaterById(id: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/theater/${id}`);
+  }
+
   getShows(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/show/all`);
   }
@@ -36,6 +40,14 @@ export class BookingService {
     return this.http.post(`${this.apiUrl}/theater/addNew`, theaterRequest, { responseType: 'text' });
   }
 
+  addTheaterSeat(seatRequest: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/theater/addTheaterSeat`, seatRequest, { responseType: 'text' });
+  }
+
+  updateTheaterSeats(theaterId: number, seats: any[]): Observable<any> {
+    return this.http.put(`${this.apiUrl}/theater/${theaterId}/seats`, seats);
+  }
+
   deleteTheater(theaterId: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/theater/${theaterId}`, { responseType: 'text' });
   }
@@ -43,6 +55,14 @@ export class BookingService {
   // Admin: Shows
   addShow(showRequest: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/show/addNew`, showRequest, { responseType: 'text' });
+  }
+
+  associateShowSeats(seatRequest: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/show/associateSeats`, seatRequest, { responseType: 'text' });
+  }
+
+  updateShowSeats(showId: number, seats: any[]): Observable<any> {
+    return this.http.put(`${this.apiUrl}/show/${showId}/seats`, seats);
   }
 
   deleteShow(showId: number): Observable<any> {

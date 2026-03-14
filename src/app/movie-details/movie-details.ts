@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MovieService } from '../services/movie.service';
@@ -15,7 +15,8 @@ export class MovieDetails implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private movieService: MovieService
+    private movieService: MovieService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -25,11 +26,16 @@ export class MovieDetails implements OnInit {
         next: (data) => {
           this.movie = data;
           this.isLoading = false;
+          this.cdr.detectChanges();
         },
-        error: () => this.isLoading = false
+        error: () => {
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        }
       });
     } else {
       this.isLoading = false;
     }
   }
 }
+

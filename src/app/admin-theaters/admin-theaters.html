@@ -59,7 +59,7 @@
         <table class="admin-table">
           <thead>
             <tr>
-              <th>ID Rạp</th>
+              <th>ID</th>
               <th>Tên Rạp</th>
               <th>Địa chỉ</th>
               <th>Hành động</th>
@@ -81,7 +81,12 @@
                   <td>{{ theater.name }}</td>
                   <td>{{ theater.address }}</td>
                   <td>
-                    <button class="action-btn delete" (click)="deleteTheater(theater.id)"><i class="fa-solid fa-trash"></i></button>
+                    <button class="action-btn edit" title="Chỉnh sửa ghế" (click)="openSeatEditor(theater)" style="margin-right: 8px;">
+                      <i class="fa-solid fa-chair"></i>
+                    </button>
+                    <button class="action-btn delete" (click)="deleteTheater(theater.id)">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
                   </td>
                 </tr>
               }
@@ -93,47 +98,137 @@
   </main>
 </div>
 
+<!-- Add Modal (Already exists, keeping it) -->
 @if (showAddModal) {
-<div class="modal-overlay">
-  <div class="modal-content">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-      <h3 style="margin: 0; font-size: 20px;">Thêm Rạp Mới</h3>
-      <button style="background: none; border: none; font-size: 20px; cursor: pointer;" (click)="closeAddModal()">&times;</button>
+<div class="modal-overlay" (click)="closeAddModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <!-- ... (rest of add modal content) ... -->
+    <div class="modal-header">
+      <h3>Thêm Rạp Mới</h3>
+      <button class="modal-close-btn" (click)="closeAddModal()">&times;</button>
     </div>
     
-    @if (message) {
-      <div style="padding: 12px; background: #dcfce7; color: #166534; border-radius: 8px; margin-bottom: 16px;">
-        <i class="fa-solid fa-check-circle"></i> {{ message }}
-      </div>
-    }
-    @if (error) {
-      <div style="padding: 12px; background: #fee2e2; color: #991b1b; border-radius: 8px; margin-bottom: 16px;">
-        <i class="fa-solid fa-triangle-exclamation"></i> {{ error }}
-      </div>
-    }
-
     <form (ngSubmit)="onSubmit()">
-      <div style="margin-bottom: 16px;">
-        <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px;">Tên Rạp</label>
-        <input type="text" [(ngModel)]="theaterData.name" name="name" required
-          style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit;">
+      <!-- Theater Info -->
+      <div class="form-group">
+        <label class="form-label">Tên Rạp</label>
+        <input type="text" class="form-input" [(ngModel)]="theaterData.name" name="name" required placeholder="VD: CGV Vincom Mega Mall">
       </div>
       
-      <div style="margin-bottom: 24px;">
-        <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px;">Địa chỉ</label>
-        <input type="text" [(ngModel)]="theaterData.address" name="address" required
-          style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit;">
+      <div class="form-group">
+        <label class="form-label">Địa chỉ</label>
+        <input type="text" class="form-input" [(ngModel)]="theaterData.address" name="address" required placeholder="VD: 72 Lê Thánh Tôn, Q.1, TP.HCM">
       </div>
-      <div style="display: flex; gap: 12px; justify-content: flex-end;">
-        <button type="button" (click)="closeAddModal()" 
-          style="padding: 10px 20px; border-radius: 8px; border: 1px solid var(--border-color); background: white; cursor: pointer; font-weight: 500;">
-          Hủy
-        </button>
+
+      <!-- Seat Configuration Section -->
+      <div style="margin-top: 20px; padding: 16px; background: rgba(124, 58, 237, 0.05); border-radius: 12px; border: 1px solid rgba(124, 58, 237, 0.15);">
+        <h4 style="margin: 0 0 16px 0; font-size: 15px; color: var(--primary-color); display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-chair"></i> Cấu hình Ghế ngồi ban đầu
+        </h4>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Số ghế mỗi hàng</label>
+            <input type="number" class="form-input" [(ngModel)]="seatData.noOfSeatInRow" name="noOfSeatInRow" min="1" max="30" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fa-solid fa-crown" style="color: #f59e0b;"></i> Ghế VIP (Premium)
+            </label>
+            <input type="number" class="form-input" [(ngModel)]="seatData.noOfPremiumSeat" name="noOfPremiumSeat" min="0" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fa-solid fa-couch" style="color: #6b7280;"></i> Ghế Thường (Classic)
+            </label>
+            <input type="number" class="form-input" [(ngModel)]="seatData.noOfClassicSeat" name="noOfClassicSeat" min="0" required>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 16px; margin-top: 8px;">
+          <div style="flex: 1; padding: 10px 14px; background: white; border-radius: 8px; text-align: center; border: 1px solid #e5e7eb;">
+            <div style="font-size: 20px; font-weight: 700; color: var(--primary-color);">{{ totalSeats }}</div>
+            <div style="font-size: 12px; color: #6b7280;">Tổng ghế</div>
+          </div>
+          <div style="flex: 1; padding: 10px 14px; background: white; border-radius: 8px; text-align: center; border: 1px solid #e5e7eb;">
+            <div style="font-size: 20px; font-weight: 700; color: #f59e0b;">{{ seatData.noOfPremiumSeat }}</div>
+            <div style="font-size: 12px; color: #6b7280;">VIP</div>
+          </div>
+          <div style="flex: 1; padding: 10px 14px; background: white; border-radius: 8px; text-align: center; border: 1px solid #e5e7eb;">
+            <div style="font-size: 20px; font-weight: 700; color: #6b7280;">{{ seatData.noOfClassicSeat }}</div>
+            <div style="font-size: 12px; color: #6b7280;">Thường</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions" style="margin-top: 24px;">
+        <button type="button" (click)="closeAddModal()" class="form-btn-cancel">Hủy</button>
         <button type="submit" [disabled]="isLoading" class="primary-btn" style="border: none;">
           {{ isLoading ? 'Đang thêm...' : 'Lưu Rạp' }}
         </button>
       </div>
     </form>
+  </div>
+</div>
+}
+
+<!-- Seat Editor Modal -->
+@if (showSeatEditor) {
+<div class="modal-overlay" (click)="closeSeatEditor()">
+  <div class="modal-content" (click)="$event.stopPropagation()" style="width: 800px; max-width: 95vw;">
+    <div class="modal-header">
+      <h3>Thiết kế Sơ đồ ghế: {{ selectedTheater?.name }}</h3>
+      <button class="modal-close-btn" (click)="closeSeatEditor()">&times;</button>
+    </div>
+
+    <div style="margin-bottom: 24px; padding: 16px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
+      <p style="margin: 0; font-size: 14px; color: #64748b;">
+        <i class="fa-solid fa-circle-info"></i> Click vào từng ghế để chuyển đổi giữa <strong>Ghế Thường (Classic)</strong> và <strong>Ghế cao cấp (Premium/VIP)</strong>.
+      </p>
+      <div style="display: flex; gap: 24px; margin-top: 12px;">
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px;">
+          <span style="width: 24px; height: 24px; background: #f3f4f6; border: 2px solid #d1d5db; border-radius: 4px; display: inline-block;"></span> 
+          <span>Ghế Thường</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px;">
+          <span style="width: 24px; height: 24px; background: #fef3c7; border: 2px solid #fcd34d; border-radius: 4px; display: inline-block;"></span> 
+          <span>Ghế VIP 👑</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: #1e293b; padding: 40px 20px; border-radius: 16px; margin-bottom: 24px; display: flex; flex-direction: column; align-items: center; overflow-x: auto;">
+      <div style="width: 400px; height: 4px; background: #94a3b8; border-radius: 4px; box-shadow: 0 4px 20px rgba(255,255,255,0.2); margin-bottom: 40px; text-align: center;">
+        <span style="color: #94a3b8; font-size: 10px; letter-spacing: 4px; position: relative; top: 12px;">MÀN HÌNH</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        @for (row of seatRows; track row) {
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="color: #64748b; font-weight: bold; width: 20px; font-size: 12px;">{{ row }}</span>
+            @for (seat of getSeatsForRow(row); track seat.id) {
+              <button 
+                (click)="toggleSeatType(seat)"
+                style="width: 30px; height: 30px; border-radius: 6px; cursor: pointer; border: 2px solid; transition: all 0.2s;"
+                [style.background-color]="seat.seatType === 'PREMIUM' ? '#fef3c7' : '#f3f4f6'"
+                [style.border-color]="seat.seatType === 'PREMIUM' ? '#fcd34d' : '#d1d5db'"
+                [title]="seat.seatNo + ' (' + seat.seatType + ')'"
+              ></button>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" (click)="closeSeatEditor()" class="form-btn-cancel">Hủy</button>
+      <button type="button" (click)="saveSeatChanges()" [disabled]="savingSeats" class="primary-btn" style="border: none;">
+        {{ savingSeats ? 'Đang lưu...' : 'Lưu sơ đồ ghế' }}
+      </button>
+    </div>
   </div>
 </div>
 }
