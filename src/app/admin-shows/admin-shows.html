@@ -193,7 +193,7 @@
       <div style="display: flex; flex-direction: column; gap: 8px;">
         @for (row of seatRows; track row) {
           <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="color: #64748b; font-weight: bold; width: 20px; font-size: 12px;">{{ row }}</span>
+            <span style="color: #64748b; font-weight: bold; width: 30px; font-size: 12px;">{{ row }}</span>
             @for (seat of getSeatsForRow(row); track seat.id) {
               <button 
                 (click)="toggleSeatType(seat)"

@@ -10,17 +10,20 @@
   <div class="tickets-content">
     
     <div class="tabs">
-      <button class="tab active">Vé sắp xem</button>
-      <button class="tab">Vé đã xem</button>
+      <button class="tab active">Vé đã đặt</button>
     </div>
 
     <div class="ticket-list">
       @if (isLoading) {
         <p style="text-align: center; color: var(--text-secondary); margin-top: 40px;">Đang tải danh sách vé...</p>
       } @else if (tickets.length === 0) {
-        <p style="text-align: center; color: var(--text-secondary); margin-top: 40px;">Bạn chưa có vé nào. Hãy đặt vé ngay!</p>
+        <div style="text-align: center; margin-top: 60px;">
+          <i class="fa-solid fa-ticket" style="font-size: 64px; color: #e5e7eb; margin-bottom: 16px;"></i>
+          <p style="color: var(--text-secondary);">Bạn chưa có vé nào. Hãy đặt vé ngay!</p>
+          <button class="primary-btn" routerLink="/" style="margin-top: 16px; border: none;">Xem phim</button>
+        </div>
       } @else {
-        @for (ticket of tickets; track ticket.id) {
+        @for (ticket of tickets; track ticket.ticketId) {
           <div class="ticket-stub-card">
             <div class="ticket-visual">
               <div class="movie-poster placeholder-poster">
@@ -30,25 +33,25 @@
 
             <div class="ticket-details">
               <span class="status-badge valid">Đã Đặt</span>
-              <h3 class="movie-title">Vé #{{ ticket.id }}</h3>
-              <p class="movie-type">ID Rạp: {{ ticket.theaterId }} • ID Suất Chiếu: {{ ticket.showId }}</p>
+              <h3 class="movie-title">{{ ticket.show?.movie?.movieName || 'Phim' }}</h3>
+              <p class="movie-type">{{ ticket.show?.theater?.name || 'Rạp' }}</p>
 
               <div class="info-grid">
                 <div class="info-group">
-                  <span class="label">Ngày đặt</span>
-                  <span class="value">{{ ticket.ticketDate | date:'dd/MM/yyyy' }}</span>
+                  <span class="label">Ngày chiếu</span>
+                  <span class="value">{{ ticket.show?.date | date:'dd/MM/yyyy' }}</span>
                 </div>
                 <div class="info-group">
-                  <span class="label">Giờ đặt</span>
-                  <span class="value">{{ ticket.ticketTime | slice:0:5 }}</span>
+                  <span class="label">Giờ chiếu</span>
+                  <span class="value">{{ ticket.show?.time | slice:0:5 }}</span>
                 </div>
                 <div class="info-group">
-                  <span class="label">Số vé</span>
-                  <span class="value">{{ ticket.noOfSeats }}</span>
+                  <span class="label">Ghế</span>
+                  <span class="value">{{ ticket.bookedSeats }}</span>
                 </div>
                 <div class="info-group">
                   <span class="label">Tổng tiền</span>
-                  <span class="value">{{ ticket.amount | number:'1.0-0' }}đ</span>
+                  <span class="value">{{ formatPrice(ticket.totalTicketsPrice) }}</span>
                 </div>
               </div>
             </div>
@@ -57,7 +60,7 @@
               <div class="qr-code-placeholder">
                 <i class="fa-solid fa-qrcode"></i>
               </div>
-              <p class="instruction">Mã đặt chỗ: <br/><strong>{{ ticket.ticketId || ('TK' + ticket.id) }}</strong></p>
+              <p class="instruction">Mã đặt chỗ: <br/><strong>TK{{ ticket.ticketId }}</strong></p>
             </div>
           </div>
         }

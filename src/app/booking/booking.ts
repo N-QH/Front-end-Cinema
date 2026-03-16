@@ -1,9 +1,10 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { RouterLink, ActivatedRoute } from '@angular/router';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { BookingService } from '../services/booking.service';
 import { AuthService } from '../services/auth.service';
 import { FormsModule } from '@angular/forms';
+import { ToastService } from '../services/toast.service';
 
 interface SeatInfo {
   id: number;
@@ -32,12 +33,14 @@ export class Booking implements OnInit {
   selectedSeats: string[] = []; // Store seatNo for display
   selectedSeatNos: string[] = []; // Redundant but keeping consistent
   totalPrice = 0;
-  userId: number = 1;
+  userId: number | null = null;
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private bookingService: BookingService,
     private authService: AuthService,
+    private toastService: ToastService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -54,8 +57,8 @@ export class Booking implements OnInit {
     const email = this.authService.getUserEmail();
     if (email) {
       this.authService.getUserByEmail(email).subscribe(user => {
-        if (user && user.userId) {
-          this.userId = user.userId;
+        if (user && user.id) {
+          this.userId = user.id;
         }
       });
     }
@@ -91,19 +94,22 @@ export class Booking implements OnInit {
         occupied: !s.isAvailable
       }));
       
-      // Organize into rows
+      // Organize into rows by numeric prefix (seatNo format: "1A", "2B", etc.)
       const rowsSet = new Set<string>();
       this.seats.forEach(s => {
-        const rowMatch = s.seatNo.match(/[A-Z]+/);
-        if (rowMatch) rowsSet.add(rowMatch[0]);
+        const rowMatch = s.seatNo.match(/^(\d+)/);
+        if (rowMatch) rowsSet.add(rowMatch[1]);
       });
-      this.seatRows = Array.from(rowsSet).sort();
+      this.seatRows = Array.from(rowsSet).sort((a, b) => parseInt(a) - parseInt(b));
     }
     this.cdr.detectChanges();
   }
 
   getSeatsForRow(row: string): SeatInfo[] {
-    return this.seats.filter(s => s.seatNo.startsWith(row));
+    return this.seats.filter(s => {
+      const match = s.seatNo.match(/^(\d+)/);
+      return match && match[1] === row;
+    });
   }
 
   toggleSeat(seat: SeatInfo) {
@@ -138,33 +144,24 @@ export class Booking implements OnInit {
 
   onBook() {
     if (!this.selectedShowId || this.selectedSeats.length === 0) {
-      alert("Vui lòng chọn suất chiếu và ghế ngồi!");
+      this.toastService.showError("Vui lòng chọn suất chiếu và ghế ngồi!");
       return;
     }
 
-    const payload = {
-      showId: this.selectedShowId,
-      userId: this.userId,
-      requestSeats: this.selectedSeats
-    };
+    const selectedShow = this.shows.find(s => (s.showId || s.id) === this.selectedShowId);
+    const selectedTheater = this.theaters.find(t => t.id === this.selectedTheaterId);
 
-    this.bookingService.bookTicket(payload).subscribe({
-      next: (res) => {
-        alert("Đặt vé thành công!");
-        this.selectedSeats = [];
-        this.totalPrice = 0;
-        // Refresh show data to update seat occupancy
-        if (this.movieId) {
-          this.bookingService.getShowsByMovieId(this.movieId).subscribe(shows => {
-            this.shows = shows;
-            const updatedShow = shows.find((s: any) => (s.showId || s.id) === this.selectedShowId);
-            if (updatedShow) this.selectShow(updatedShow);
-            this.cdr.detectChanges();
-          });
+    this.router.navigate(['/payment'], { 
+      state: { 
+        bookingInfo: {
+          movie: selectedShow?.movie,
+          theater: selectedTheater,
+          show: selectedShow,
+          seats: this.selectedSeats,
+          totalPrice: this.totalPrice,
+          showId: this.selectedShowId,
+          userId: this.userId
         }
-      },
-      error: (err) => {
-        alert("Đặt vé thất bại: " + (err.error || "Lỗi máy chủ"));
       }
     });
   }

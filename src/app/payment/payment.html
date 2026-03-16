@@ -1,13 +1,13 @@
 <div class="payment-container">
   <div class="payment-header">
-    <button class="back-btn" routerLink="/booking/1">
+    <button class="back-btn" [routerLink]="['/booking', bookingInfo?.movie?.id]">
       <i class="fa-solid fa-arrow-left"></i> Quay lại
     </button>
     <h2>Thanh toán</h2>
     <div class="header-placeholder"></div>
   </div>
 
-  <div class="payment-content">
+  <div class="payment-content" *ngIf="bookingInfo; else noData">
     
     <div class="payment-methods-panel">
       <h3>Hình thức thanh toán</h3>
@@ -65,7 +65,7 @@
           <div class="ticket-poster placeholder-poster"><i class="fa-solid fa-image"></i></div>
           <div class="ticket-details">
             <span class="age-badge">16+</span>
-            <h4>Mưa đỏ</h4>
+            <h4>{{ bookingInfo.movie?.movieName }}</h4>
             <p>2D Phụ đề Tiếng Việt</p>
           </div>
         </div>
@@ -75,11 +75,11 @@
         <div class="ticket-info-grid">
           <div class="info-item">
             <span class="info-label">Rạp</span>
-            <span class="info-value">CGV Vincom Center</span>
+            <span class="info-value">{{ bookingInfo.theater?.name }}</span>
           </div>
           <div class="info-item">
             <span class="info-label">Suất chiếu</span>
-            <span class="info-value">12:00, Hôm nay</span>
+            <span class="info-value">{{ bookingInfo.show?.time }}, {{ bookingInfo.show?.date | date:'dd/MM/yyyy' }}</span>
           </div>
           <div class="info-item">
             <span class="info-label">Phòng chiếu</span>
@@ -87,15 +87,15 @@
           </div>
           <div class="info-item">
             <span class="info-label">Ghế</span>
-            <span class="info-value">A7, A8</span>
+            <span class="info-value">{{ getSeatsString() }}</span>
           </div>
         </div>
       </div>
       
       <div class="price-breakdown">
         <div class="price-row">
-          <span>Vé x2</span>
-          <span>180.000đ</span>
+          <span>Vé x{{ bookingInfo.seats?.length }}</span>
+          <span>{{ formatPrice(bookingInfo.totalPrice) }}</span>
         </div>
         <div class="price-row">
           <span>Phí giao dịch</span>
@@ -112,12 +112,22 @@
         
         <div class="price-total">
           <span>Tổng cộng</span>
-          <span class="total-amount">190.000đ</span>
+          <span class="total-amount">{{ formatPrice(bookingInfo.totalPrice + 10000) }}</span>
         </div>
       </div>
 
-      <button class="checkout-btn" routerLink="/tickets">Thanh Toán</button>
+      <button class="checkout-btn" (click)="confirmPayment()" [disabled]="isProcessing">
+        {{ isProcessing ? 'Đang xử lý...' : 'Thanh Toán' }}
+      </button>
     </div>
-    
   </div>
+
+  <ng-template #noData>
+    <div style="text-align: center; padding: 100px 0;">
+      <i class="fa-solid fa-cart-shopping" style="font-size: 64px; color: #e5e7eb; margin-bottom: 24px;"></i>
+      <h3>Chưa có thông tin đặt vé</h3>
+      <p style="color: #64748b;">Vui lòng chọn phim và suất chiếu trước khi thanh toán.</p>
+      <button class="primary-btn" routerLink="/" style="margin-top: 24px; border: none;">Quay về Trang chủ</button>
+    </div>
+  </ng-template>
 </div>

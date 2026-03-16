@@ -84,14 +84,17 @@ export class AdminTheaters implements OnInit {
   organizeSeats() {
     const rowsSet = new Set<string>();
     this.selectedTheaterSeats.forEach(s => {
-      const rowMatch = s.seatNo.match(/[A-Z]+/);
-      if (rowMatch) rowsSet.add(rowMatch[0]);
+      const rowMatch = s.seatNo.match(/^(\d+)/);
+      if (rowMatch) rowsSet.add(rowMatch[1]);
     });
-    this.seatRows = Array.from(rowsSet).sort();
+    this.seatRows = Array.from(rowsSet).sort((a, b) => parseInt(a) - parseInt(b));
   }
 
   getSeatsForRow(row: string) {
-    return this.selectedTheaterSeats.filter(s => s.seatNo.startsWith(row));
+    return this.selectedTheaterSeats.filter(s => {
+      const match = s.seatNo.match(/^(\d+)/);
+      return match && match[1] === row;
+    });
   }
 
   toggleSeatType(seat: any) {
