@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { BookingService } from '../services/booking.service';
@@ -17,7 +17,8 @@ export class Payment {
   constructor(
     private router: Router,
     private bookingService: BookingService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private cdr: ChangeDetectorRef
   ) {
     const navigation = this.router.getCurrentNavigation();
     this.bookingInfo = navigation?.extras.state?.['bookingInfo'];
@@ -39,6 +40,7 @@ export class Payment {
   confirmPayment() {
     if (!this.bookingInfo || this.isProcessing) return;
     this.isProcessing = true;
+    this.cdr.detectChanges(); // Fix NG0100
 
     const payload = {
       showId: this.bookingInfo.showId,
@@ -53,6 +55,7 @@ export class Payment {
       },
       error: (err) => {
         this.isProcessing = false;
+        this.cdr.detectChanges(); // Update UI after error
         this.toastService.showError('Thanh toán thất bại: ' + (err.error || 'Lỗi máy chủ'));
       }
     });
