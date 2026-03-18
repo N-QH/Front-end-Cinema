@@ -94,7 +94,7 @@
             <input type="checkbox" />
             <span>Ghi nhớ đăng nhập</span>
           </label>
-          <a href="#" class="forgot-password">Quên mật khẩu?</a>
+          <a routerLink="/forgot-password" class="forgot-password">Quên mật khẩu?</a>
         </div>
       }
 
@@ -110,10 +110,10 @@
           <span>Hoặc</span>
         </div>
 
-        <button type="button" class="social-btn google-btn">
+        <a href="http://localhost:8080/oauth2/authorization/google" class="social-btn google-btn" style="text-decoration: none; display: flex; justify-content: center; align-items: center; gap: 12px;">
           <i class="fa-brands fa-google"></i>
           Tiếp tục với Google
-        </button>
+        </a>
       }
     </form>
     

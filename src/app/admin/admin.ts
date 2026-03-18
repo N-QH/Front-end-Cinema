@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MovieService } from '../services/movie.service';
 import { ToastService } from '../services/toast.service';
+import { AdminService } from '../services/admin.service';
 
 @Component({
   selector: 'app-admin',
@@ -23,21 +24,51 @@ export class Admin implements OnInit {
   error: string | null = null;
   
   movies: any[] = [];
+  stats: any = {
+    ticketsToday: 0,
+    activeMovies: 0,
+    revenueToday: 0,
+    totalUsers: 0
+  };
 
   movieData = {
     movieName: '',
     duration: 120,
     releaseDate: '2026-10-12',
-    genre: 'ACTION',
+    genres: [] as string[],
     language: 'ENGLISH',
     description: '',
     movieImage: ''
   };
 
-  constructor(private movieService: MovieService, private cdr: ChangeDetectorRef, private toastService: ToastService) {}
+  allGenres = [
+    'ACTION', 'COMEDY', 'DRAMA', 'HORROR', 'SCI_FI', 'THRILLER',
+    'ROMANCE', 'ANIMATION', 'DOCUMENTARY', 'ADVENTURE', 'FANTASY',
+    'MYSTERY', 'CRIME', 'WESTERN'
+  ];
+
+  constructor(
+    private movieService: MovieService, 
+    private cdr: ChangeDetectorRef, 
+    private toastService: ToastService,
+    private adminService: AdminService
+  ) {}
 
   ngOnInit() {
     this.loadMovies();
+    this.loadStats();
+  }
+
+  loadStats() {
+    this.adminService.getDashboardStats().subscribe({
+      next: (res) => {
+        this.stats = res;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Failed to load dashboard stats', err);
+      }
+    });
   }
 
   loadMovies() {
@@ -71,7 +102,7 @@ export class Admin implements OnInit {
       movieName: movie.movieName,
       duration: movie.duration,
       releaseDate: movie.releaseDate,
-      genre: movie.genre,
+      genres: movie.genre ? movie.genre.split(',').map((g: string) => g.trim()) : [],
       language: movie.language,
       description: movie.description,
       movieImage: movie.movieImage
@@ -79,6 +110,19 @@ export class Admin implements OnInit {
     this.showAddModal = true;
     this.message = null;
     this.error = null;
+  }
+
+  toggleGenre(genre: string) {
+    const index = this.movieData.genres.indexOf(genre);
+    if (index > -1) {
+      this.movieData.genres.splice(index, 1);
+    } else {
+      this.movieData.genres.push(genre);
+    }
+  }
+
+  isGenreSelected(genre: string): boolean {
+    return this.movieData.genres.includes(genre);
   }
 
   closeAddModal() {
@@ -119,8 +163,13 @@ export class Admin implements OnInit {
     this.message = null;
     this.error = null;
 
+    const payload = {
+      ...this.movieData,
+      genre: this.movieData.genres.join(',')
+    };
+
     if (this.isEditing && this.currentMovieId) {
-      this.movieService.updateMovie(this.currentMovieId, this.movieData).subscribe({
+      this.movieService.updateMovie(this.currentMovieId, payload).subscribe({
         next: (res) => {
           this.handleSuccess('Cập nhật phim thành công!');
         },
@@ -129,7 +178,7 @@ export class Admin implements OnInit {
         }
       });
     } else {
-      this.movieService.addMovie(this.movieData).subscribe({
+      this.movieService.addMovie(payload).subscribe({
         next: (res) => {
           this.handleSuccess('Thêm phim thành công!');
         },
@@ -173,7 +222,7 @@ export class Admin implements OnInit {
       movieName: '',
       duration: 120,
       releaseDate: '2026-10-12',
-      genre: 'ACTION',
+      genres: [],
       language: 'ENGLISH',
       description: '',
       movieImage: ''
