@@ -69,7 +69,7 @@
         <div class="input-wrapper">
           <i class="fa-regular fa-envelope"></i>
           @if (isLoginMode) {
-            <input type="email" id="email" name="email" [(ngModel)]="loginData.username" (input)="clearError()" placeholder="Nhập email của bạn" required />
+            <input type="email" id="email" name="email" [(ngModel)]="loginData.email" (input)="clearError()" placeholder="Nhập email của bạn" required />
           } @else {
             <input type="email" id="email" name="email" [(ngModel)]="registerData.email" placeholder="Nhập email của bạn" required />
           }

@@ -19,7 +19,7 @@ export class Auth implements OnInit {
   error: string | null = null;
   successMessage: string | null = null;
 
-  loginData = { username: '', password: '' };
+  loginData = { email: '', password: '' };
   registerData = { 
     name: '', 
     email: '', 
