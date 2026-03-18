@@ -54,6 +54,25 @@
                   <span class="value">{{ formatPrice(ticket.totalTicketsPrice) }}</span>
                 </div>
               </div>
+
+              <!-- Rating Section -->
+              <div class="ticket-rating">
+                @if (ticket.rating) {
+                  <span class="rating-label">Bạn đã đánh giá:</span>
+                  <div class="stars active">
+                    @for (s of [1,2,3,4,5]; track s) {
+                      <i class="fa-solid fa-star" [class.filled]="s <= ticket.rating"></i>
+                    }
+                  </div>
+                } @else {
+                  <span class="rating-label">Đánh giá phim:</span>
+                  <div class="stars interactive">
+                    @for (s of [1,2,3,4,5]; track s) {
+                      <i class="fa-solid fa-star" (click)="rateTicket(ticket.ticketId, s)"></i>
+                    }
+                  </div>
+                }
+              </div>
             </div>
 
             <div class="ticket-qr-section">

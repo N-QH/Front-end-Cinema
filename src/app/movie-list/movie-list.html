@@ -1,9 +1,9 @@
 <div class="movie-section">
-  <div class="movie-grid">
+  <div class="movie-list-container">
     @if (isLoading) {
       <div class="loading-state">Đang tải danh sách phim...</div>
     } @else {
-      @for (movie of movies; track movie.id) {
+      @for (movie of pagedMovies; track movie.id) {
         <app-movie-item [movie]="movie"></app-movie-item>
       } @empty {
         <div class="empty-state">Hiện chưa có phim nào khởi chiếu.</div>
@@ -11,5 +11,11 @@
     }
   </div>
   
-  <app-pagination></app-pagination>
+  @if (totalPages > 1) {
+    <app-pagination 
+      [currentPage]="currentPage" 
+      [totalPages]="totalPages" 
+      (pageChange)="onPageChange($any($event))">
+    </app-pagination>
+  }
 </div>

@@ -19,7 +19,7 @@
       <a href="#" class="nav-item active" routerLink="/admin/shows">
         <i class="fa-solid fa-calendar-alt"></i> Lịch chiếu
       </a>
-      <a href="#" class="nav-item">
+      <a href="#" class="nav-item" routerLink="/admin/customers">
         <i class="fa-solid fa-users"></i> Khách hàng
       </a>
       <a href="#" class="nav-item" routerLink="/admin/reports">
@@ -62,6 +62,7 @@
               <th>ID</th>
               <th>Ngày chiếu</th>
               <th>Giờ chiếu</th>
+              <th>Phòng</th>
               <th>Phim</th>
               <th>Rạp</th>
               <th>Hành động</th>
@@ -80,8 +81,9 @@
               @for (show of shows; track show.showId || show.id) {
                 <tr>
                   <td>#{{ show.showId || show.id }}</td>
-                  <td>{{ show.date | date:'dd/MM/yyyy' }}</td>
-                  <td>{{ show.time }}</td>
+                  <td>{{ show.showDate | date:'dd/MM/yyyy' }}</td>
+                  <td>{{ show.showTime }}</td>
+                  <td>{{ show.screenNumber || 'N/A' }}</td>
                   <td>{{ show.movie?.movieName || 'N/A' }}</td>
                   <td>{{ show.theater?.name || 'N/A' }}</td>
                   <td>
@@ -119,6 +121,10 @@
         <div class="form-group">
           <label class="form-label">Giờ chiếu</label>
           <input type="time" class="form-input" [(ngModel)]="showData.showStartTime" name="showStartTime" required step="60">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Số phòng</label>
+          <input type="number" class="form-input" [(ngModel)]="showData.screenNumber" name="screenNumber" placeholder="VD: 1" required>
         </div>
       </div>
       
@@ -183,6 +189,16 @@
       <p style="margin: 0; font-size: 14px; color: #92400e;">
         <i class="fa-solid fa-triangle-exclamation"></i> Chỉnh sửa tại đây chỉ áp dụng cho <strong>Suất chiếu này</strong>.
       </p>
+      <div style="display: flex; gap: 24px; margin-top: 12px;">
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px;">
+          <span style="width: 24px; height: 24px; background: #f3f4f6; border: 2px solid #d1d5db; border-radius: 4px; display: inline-block;"></span> 
+          <span>Ghế Thường</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px;">
+          <span style="width: 24px; height: 24px; background: #fef3c7; border: 2px solid #fcd34d; border-radius: 4px; display: inline-block;"></span> 
+          <span>Ghế VIP 👑</span>
+        </div>
+      </div>
     </div>
 
     <div style="background: #1e293b; padding: 40px 20px; border-radius: 16px; margin-bottom: 24px; display: flex; flex-direction: column; align-items: center; overflow-x: auto;">
@@ -194,15 +210,17 @@
         @for (row of seatRows; track row) {
           <div style="display: flex; align-items: center; gap: 8px;">
             <span style="color: #64748b; font-weight: bold; width: 30px; font-size: 12px;">{{ row }}</span>
-            @for (seat of getSeatsForRow(row); track seat.id) {
-              <button 
-                (click)="toggleSeatType(seat)"
-                style="width: 30px; height: 30px; border-radius: 6px; cursor: pointer; border: 2px solid; transition: all 0.2s;"
-                [style.background-color]="seat.seatType === 'PREMIUM' ? '#fef3c7' : '#f3f4f6'"
-                [style.border-color]="seat.seatType === 'PREMIUM' ? '#fcd34d' : '#d1d5db'"
-                [title]="seat.seatNo + ' - ' + formatPrice(seat.price)"
-              ></button>
-            }
+            <div style="display: flex; gap: 8px;">
+              @for (seat of getSeatsForRow(row); track seat.id) {
+                <button 
+                  (click)="toggleSeatType(seat)"
+                  style="width: 30px; height: 30px; border-radius: 6px; cursor: pointer; border: 2px solid; transition: all 0.2s;"
+                  [style.background-color]="(seat.theaterSeat?.seatType || seat.seatType) === 'PREMIUM' ? '#fef3c7' : '#f3f4f6'"
+                  [style.border-color]="(seat.theaterSeat?.seatType || seat.seatType) === 'PREMIUM' ? '#fcd34d' : '#d1d5db'"
+                  [title]="(seat.theaterSeat?.seatNo || seat.seatNo) + ' - ' + ((seat.theaterSeat?.seatType || seat.seatType) === 'PREMIUM' ? 'VIP' : 'Thường') + ' - ' + formatPrice(seat.price)"
+                ></button>
+              }
+            </div>
           </div>
         }
       </div>
@@ -217,3 +235,5 @@
   </div>
 </div>
 }
+
+

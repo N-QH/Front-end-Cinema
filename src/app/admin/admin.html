@@ -19,7 +19,7 @@
       <a href="#" class="nav-item" routerLink="/admin/shows">
         <i class="fa-solid fa-calendar-alt"></i> Lịch chiếu
       </a>
-      <a href="#" class="nav-item">
+      <a href="#" class="nav-item" routerLink="/admin/customers">
         <i class="fa-solid fa-users"></i> Khách hàng
       </a>
       <a href="#" class="nav-item" routerLink="/admin/reports">
@@ -114,10 +114,19 @@
                   <td>{{ movie.movieName }}</td>
                   <td>{{ movie.genre }}</td>
                   <td>{{ movie.duration }} phút</td>
-                  <td><span class="status-badge valid">Đang chiếu</span></td>
                   <td>
-                    <button class="action-btn edit"><i class="fa-solid fa-pen"></i></button>
-                    <button class="action-btn delete"><i class="fa-solid fa-trash"></i></button>
+                    @if (movie.isBanner) {
+                      <span class="status-badge valid" style="background: #7c3aed; color: white;">Banner</span>
+                    } @else {
+                      <span class="status-badge" style="background: #f1f5f9; color: #64748b;">Thường</span>
+                    }
+                  </td>
+                  <td>
+                    <button class="action-btn edit" title="Đặt làm Banner" (click)="setAsBanner(movie.id)">
+                      <i class="fa-solid fa-star" [style.color]="movie.isBanner ? '#7c3aed' : '#cbd5e1'"></i>
+                    </button>
+                    <button class="action-btn edit" (click)="openEditModal(movie)"><i class="fa-solid fa-pen"></i></button>
+                    <button class="action-btn delete" (click)="onDelete(movie.id)"><i class="fa-solid fa-trash"></i></button>
                   </td>
                 </tr>
               }
@@ -133,7 +142,7 @@
 <div class="modal-overlay" (click)="closeAddModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h3>Thêm Phim Mới</h3>
+      <h3>{{ isEditing ? 'Cập nhật Thông tin Phim' : 'Thêm Phim Mới' }}</h3>
       <button class="modal-close-btn" (click)="closeAddModal()">&times;</button>
     </div>
     
@@ -158,10 +167,6 @@
         <div class="form-group">
           <label>Thời lượng (phút)</label>
           <input type="number" class="form-input" [(ngModel)]="movieData.duration" name="duration" required placeholder="120">
-        </div>
-        <div class="form-group">
-          <label>Đánh giá</label>
-          <input type="number" step="0.1" class="form-input" [(ngModel)]="movieData.rating" name="rating" required placeholder="8.5">
         </div>
       </div>
 
@@ -210,10 +215,30 @@
       <div class="form-actions">
         <button type="button" class="btn-cancel" (click)="closeAddModal()">Hủy</button>
         <button type="submit" [disabled]="isLoading" class="primary-btn" style="border: none;">
-          {{ isLoading ? 'Đang thêm...' : 'Lưu Phim' }}
+          {{ isLoading ? 'Đang xử lý...' : (isEditing ? 'Lưu Thay Đổi' : 'Lưu Phim') }}
         </button>
       </div>
     </form>
+  </div>
+</div>
+}
+
+<!-- Custom Delete Confirmation Modal -->
+@if (showDeleteConfirm) {
+<div class="modal-overlay confirm-modal" (click)="cancelDelete()">
+  <div class="modal-content confirm-box" (click)="$event.stopPropagation()">
+    <div class="confirm-icon">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+    </div>
+    <h3>Xác nhận xóa phim?</h3>
+    <p>Hành động này không thể hoàn tác. Bạn có chắc chắn muốn xóa phim này khỏi hệ thống không?</p>
+    
+    <div class="confirm-actions">
+      <button class="btn-cancel" (click)="cancelDelete()">Hủy</button>
+      <button class="btn-delete-confirm" (click)="confirmDelete()">
+        <i class="fa-solid fa-trash"></i> Xóa Ngay
+      </button>
+    </div>
   </div>
 </div>
 }

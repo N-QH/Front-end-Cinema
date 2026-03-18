@@ -231,3 +231,51 @@
   color: var(--text-muted);
   text-align: center;
 }
+
+/* Rating Styles */
+.ticket-rating {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rating-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.stars {
+  display: flex;
+  gap: 4px;
+}
+
+.stars i {
+  font-size: 18px;
+  color: #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.stars.active i.filled {
+  color: #fbbf24;
+}
+
+.stars.interactive i {
+  cursor: pointer;
+}
+
+.stars.interactive i:hover,
+.stars.interactive i:hover ~ i {
+  color: #fbbf24;
+}
+
+/* Simple logic for star hover: coloring previous stars */
+.stars.interactive:hover i {
+    color: #fbbf24;
+}
+.stars.interactive i:hover ~ i {
+    color: #e5e7eb;
+}

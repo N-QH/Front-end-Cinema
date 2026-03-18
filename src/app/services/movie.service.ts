@@ -22,4 +22,16 @@ export class MovieService {
   getMovieById(id: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/${id}`);
   }
+
+  setMovieBanner(id: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}/banner`, {}, { responseType: 'text' });
+  }
+
+  updateMovie(id: number, movie: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}`, movie, { responseType: 'text' });
+  }
+
+  deleteMovie(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`, { responseType: 'text' });
+  }
 }

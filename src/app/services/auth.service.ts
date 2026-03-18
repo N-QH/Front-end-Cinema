@@ -10,6 +10,7 @@ import { jwtDecode } from 'jwt-decode';
 export class AuthService {
   private apiUrl = environment.apiUrl + '/user';
   private currentUserSubject = new BehaviorSubject<string | null>(this.getToken());
+  public currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(private http: HttpClient) {}
 
@@ -42,7 +43,7 @@ export class AuthService {
   }
 
   login(credentials: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/getToken`, credentials, { responseType: 'text' })
+    return this.http.post(`${this.apiUrl}/login`, credentials, { responseType: 'text' })
       .pipe(tap((token: string) => {
         if (typeof window !== 'undefined') {
             localStorage.setItem('token', token);
@@ -52,7 +53,7 @@ export class AuthService {
   }
 
   register(user: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/addNew`, user, { responseType: 'text' });
+    return this.http.post(`${this.apiUrl}/register`, user, { responseType: 'text' });
   }
 
   logout() {
@@ -68,6 +69,22 @@ export class AuthService {
 
   updateProfile(userId: number, userRequest: any): Observable<any> {
     return this.http.put(`${this.apiUrl}/${userId}`, userRequest, { responseType: 'text' });
+  }
+
+  getAllUsers(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/all`);
+  }
+
+  toggleLock(userId: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${userId}/toggleLock`, {}, { responseType: 'text' });
+  }
+
+  deleteUser(userId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${userId}`, { responseType: 'text' });
+  }
+
+  changeUserPassword(userId: number, newPassword: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${userId}/password`, { newPassword }, { responseType: 'text' });
   }
 }
 

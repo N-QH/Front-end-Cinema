@@ -16,7 +16,9 @@
         <div class="profile-avatar-section">
           <img [src]="userProfile.userImage || 'https://ui-avatars.com/api/?name=' + userProfile.name + '&background=7c3aed&color=fff'" alt="Avatar" class="profile-avatar" />
           <h3 class="profile-name">{{ userProfile.name }}</h3>
-          <p class="profile-role">Khách hàng | ID: {{ userProfile.id }}</p>
+          <p class="profile-role">
+            {{ userProfile.roles?.includes('ADMIN') ? 'Quản trị viên' : 'Khách hàng' }} | ID: {{ userProfile.id }}
+          </p>
         </div>
 
         <form (ngSubmit)="onSubmit()" class="profile-form">
@@ -27,7 +29,7 @@
           
           <div class="form-group">
             <label>Email</label>
-            <input type="email" [(ngModel)]="userProfile.emailId" name="emailId" required class="form-input">
+            <input type="email" [(ngModel)]="userProfile.email" name="email" required class="form-input" readonly>
           </div>
 
           <div class="form-group">
@@ -35,9 +37,29 @@
             <input type="tel" [(ngModel)]="userProfile.mobileNo" name="mobile" required class="form-input">
           </div>
 
+          <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label>Tuổi</label>
+              <input type="number" [(ngModel)]="userProfile.age" name="age" class="form-input" min="1">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label>Giới tính</label>
+              <select [(ngModel)]="userProfile.gender" name="gender" class="form-input">
+                <option value="MALE">Nam</option>
+                <option value="FEMALE">Nữ</option>
+                <option value="OTHER">Khác</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Địa chỉ</label>
+            <input type="text" [(ngModel)]="userProfile.address" name="address" class="form-input" placeholder="Nhập địa chỉ của bạn">
+          </div>
+
           <div class="form-group">
             <label>Mật khẩu mới (Bỏ trống nếu không đổi)</label>
-            <input type="password" [(ngModel)]="newPassword" name="newPassword" class="form-input" placeholder="Nhập phần mật khẩu muốn đổi">
+            <input type="password" [(ngModel)]="newPassword" name="newPassword" class="form-input" placeholder="Nhập phần mật khẩu muốn đổi" autocomplete="new-password">
           </div>
           
           <div class="form-group">

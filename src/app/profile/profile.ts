@@ -61,9 +61,12 @@ export class Profile implements OnInit {
 
     const reqOptions: any = {
       name: this.userProfile.name,
-      emailId: this.userProfile.emailId,
+      email: this.userProfile.email,
       mobileNo: this.userProfile.mobileNo,
-      roles: this.userProfile.roles || 'USER',
+      age: this.userProfile.age,
+      gender: this.userProfile.gender,
+      address: this.userProfile.address,
+      roles: Array.isArray(this.userProfile.roles) ? this.userProfile.roles.join(',') : (this.userProfile.roles || 'CUSTOMER'),
       userImage: this.userProfile.userImage
     };
 

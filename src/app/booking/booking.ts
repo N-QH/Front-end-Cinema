@@ -88,8 +88,8 @@ export class Booking implements OnInit {
     if (show.showSeatList) {
       this.seats = show.showSeatList.map((s: any) => ({
         id: s.id,
-        seatNo: s.seatNo,
-        type: s.seatType,
+        seatNo: s.theaterSeat?.seatNo || s.seatNo,
+        type: s.theaterSeat?.seatType || s.seatType,
         price: s.price,
         occupied: !s.isAvailable
       }));

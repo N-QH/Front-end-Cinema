@@ -13,19 +13,17 @@ import { ToastService } from '../services/toast.service';
 })
 export class AdminTheaters implements OnInit {
   showAddModal = false;
-  showSeatEditor = false;
   isLoading = false;
   isFetching = true;
-  savingSeats = false;
   
   theaters: any[] = [];
-  selectedTheater: any = null;
-  selectedTheaterSeats: any[] = [];
-  seatRows: string[] = [];
-
+  
   theaterData = {
     name: '',
-    address: ''
+    address: '',
+    city: '',
+    state: '',
+    country: ''
   };
 
   seatData = {
@@ -65,60 +63,6 @@ export class AdminTheaters implements OnInit {
 
   closeAddModal() {
     this.showAddModal = false;
-  }
-
-  openSeatEditor(theater: any) {
-    this.selectedTheater = theater;
-    this.selectedTheaterSeats = JSON.parse(JSON.stringify(theater.theaterSeatList || []));
-    this.organizeSeats();
-    this.showSeatEditor = true;
-    this.cdr.detectChanges();
-  }
-
-  closeSeatEditor() {
-    this.showSeatEditor = false;
-    this.selectedTheater = null;
-    this.selectedTheaterSeats = [];
-  }
-
-  organizeSeats() {
-    const rowsSet = new Set<string>();
-    this.selectedTheaterSeats.forEach(s => {
-      const rowMatch = s.seatNo.match(/^(\d+)/);
-      if (rowMatch) rowsSet.add(rowMatch[1]);
-    });
-    this.seatRows = Array.from(rowsSet).sort((a, b) => parseInt(a) - parseInt(b));
-  }
-
-  getSeatsForRow(row: string) {
-    return this.selectedTheaterSeats.filter(s => {
-      const match = s.seatNo.match(/^(\d+)/);
-      return match && match[1] === row;
-    });
-  }
-
-  toggleSeatType(seat: any) {
-    seat.seatType = seat.seatType === 'CLASSIC' ? 'PREMIUM' : 'CLASSIC';
-    this.cdr.detectChanges();
-  }
-
-  saveSeatChanges() {
-    if (!this.selectedTheater) return;
-    this.savingSeats = true;
-    this.bookingService.updateTheaterSeats(this.selectedTheater.id, this.selectedTheaterSeats).subscribe({
-      next: (updatedSeats) => {
-        this.savingSeats = false;
-        this.toastService.showSuccess('Cập nhật sơ đồ ghế thành công!');
-        // Update local data
-        this.selectedTheater.theaterSeatList = updatedSeats;
-        this.closeSeatEditor();
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        this.savingSeats = false;
-        this.toastService.showError('Lỗi cập nhật sơ đồ ghế: ' + (err.error || ''));
-      }
-    });
   }
 
   get totalSeats(): number {
@@ -165,7 +109,13 @@ export class AdminTheaters implements OnInit {
   }
 
   resetForm() {
-    this.theaterData = { name: '', address: '' };
+    this.theaterData = { 
+      name: '', 
+      address: '', 
+      city: '', 
+      state: '', 
+      country: '' 
+    };
     this.seatData = { noOfSeatInRow: 10, noOfPremiumSeat: 20, noOfClassicSeat: 60 };
   }
 

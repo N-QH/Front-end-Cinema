@@ -30,6 +30,7 @@ export class AdminShows implements OnInit {
   showData = {
     showDate: '',
     showStartTime: '',
+    screenNumber: null as number | null,
     movieId: null as number | null,
     theaterId: null as number | null
   };
@@ -87,6 +88,7 @@ export class AdminShows implements OnInit {
 
   openSeatEditor(show: any) {
     this.selectedShow = show;
+    // Map existing showSeatList or empty array
     this.selectedShowSeats = JSON.parse(JSON.stringify(show.showSeatList || []));
     this.organizeSeats();
     this.showSeatEditor = true;
@@ -102,25 +104,43 @@ export class AdminShows implements OnInit {
   organizeSeats() {
     const rowsSet = new Set<string>();
     this.selectedShowSeats.forEach(s => {
-      const rowMatch = s.seatNo.match(/^(\d+)/);
+      const seatNo = s.theaterSeat?.seatNo || s.seatNo;
+      if (!seatNo) return;
+      const rowMatch = seatNo.match(/^(\d+)/);
       if (rowMatch) rowsSet.add(rowMatch[1]);
+      else {
+          const alphaMatch = seatNo.match(/^([A-Z]+)/);
+          if (alphaMatch) rowsSet.add(alphaMatch[1]);
+      }
     });
-    this.seatRows = Array.from(rowsSet).sort((a, b) => parseInt(a) - parseInt(b));
+    this.seatRows = Array.from(rowsSet).sort((a, b) => {
+        const aNum = parseInt(a);
+        const bNum = parseInt(b);
+        if (!isNaN(aNum) && !isNaN(bNum)) return aNum - bNum;
+        return a.localeCompare(b);
+    });
   }
 
   getSeatsForRow(row: string) {
     return this.selectedShowSeats.filter(s => {
-      const match = s.seatNo.match(/^(\d+)/);
-      return match && match[1] === row;
+      const seatNo = s.theaterSeat?.seatNo || s.seatNo;
+      if (!seatNo) return false;
+      const rowMatch = seatNo.match(/^(\d+)/);
+      if (rowMatch) return rowMatch[1] === row;
+      const alphaMatch = seatNo.match(/^([A-Z]+)/);
+      return alphaMatch && alphaMatch[1] === row;
     });
   }
 
   toggleSeatType(seat: any) {
-    if (seat.seatType === 'CLASSIC') {
+    const currentType = seat.theaterSeat?.seatType || seat.seatType;
+    if (currentType === 'STANDARD') {
+      if (seat.theaterSeat) seat.theaterSeat.seatType = 'PREMIUM';
       seat.seatType = 'PREMIUM';
       seat.price = this.seatPricing.priceOfPremiumSeat;
     } else {
-      seat.seatType = 'CLASSIC';
+      if (seat.theaterSeat) seat.theaterSeat.seatType = 'STANDARD';
+      seat.seatType = 'STANDARD';
       seat.price = this.seatPricing.priceOfClassicSeat;
     }
     this.cdr.detectChanges();
@@ -130,6 +150,9 @@ export class AdminShows implements OnInit {
     if (!this.selectedShow) return;
     this.savingSeats = true;
     const showId = this.selectedShow.showId || this.selectedShow.id;
+    
+    // We'll use associateShowSeats to re-sync or a specific update call if available.
+    // Given previous context, updateShowSeats was being used.
     this.bookingService.updateShowSeats(showId, this.selectedShowSeats).subscribe({
       next: (updatedSeats) => {
         this.savingSeats = false;
@@ -162,36 +185,42 @@ export class AdminShows implements OnInit {
     const showRequest = {
       showDate: this.showData.showDate,
       showStartTime: timeValue,
+      screenNumber: this.showData.screenNumber,
       movieId: this.showData.movieId,
       theaterId: this.showData.theaterId
     };
 
     this.bookingService.addShow(showRequest).subscribe({
-      next: (res) => {
-        // After show is added, we need to associate seats
-        // Let's find the show by fetching all shows again
-        this.bookingService.getShows().subscribe({
-          next: (allShows) => {
-            // Find the show matching our criteria (usually the last one)
-            const latestShow = allShows[allShows.length - 1];
-            if (latestShow) {
-              const seatRequest = {
-                showId: latestShow.showId || latestShow.id,
-                priceOfPremiumSeat: this.seatPricing.priceOfPremiumSeat,
-                priceOfClassicSeat: this.seatPricing.priceOfClassicSeat
-              };
+      next: (showIdStr) => {
+        const showId = parseInt(showIdStr, 10);
+        if (isNaN(showId)) {
+           this.toastService.showError('Thêm lịch chiếu thành công nhưng Backend trả về ID hỏng.');
+           this.isLoading = false;
+           this.loadShows();
+           this.cdr.detectChanges();
+           return;
+        }
 
-              this.bookingService.associateShowSeats(seatRequest).subscribe({
-                next: () => {
-                  this.isLoading = false;
-                  this.toastService.showSuccess('Thêm lịch chiếu và cấu hình ghế thành công!');
-                  this.resetForm();
-                  this.closeAddModal();
-                  this.loadShows();
-                  this.cdr.detectChanges();
-                }
-              });
-            }
+        const seatRequest = {
+          showId: showId,
+          priceOfPremiumSeat: this.seatPricing.priceOfPremiumSeat,
+          priceOfClassicSeat: this.seatPricing.priceOfClassicSeat
+        };
+
+        this.bookingService.associateShowSeats(seatRequest).subscribe({
+          next: () => {
+            this.isLoading = false;
+            this.toastService.showSuccess('Thêm lịch chiếu và cấu hình ghế thành công!');
+            this.resetForm();
+            this.closeAddModal();
+            this.loadShows();
+            this.cdr.detectChanges();
+          },
+          error: (err) => {
+             this.isLoading = false;
+             this.toastService.showError('Lỗi cấu hình ghế: ' + (err.error || ''));
+             this.loadShows();
+             this.cdr.detectChanges();
           }
         });
       },
@@ -207,6 +236,7 @@ export class AdminShows implements OnInit {
     this.showData = {
       showDate: '',
       showStartTime: '',
+      screenNumber: null,
       movieId: null,
       theaterId: null
     };

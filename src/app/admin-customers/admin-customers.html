@@ -1,0 +1,219 @@
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="admin-brand">
+      <i class="fa-solid fa-film"></i>
+      <span>Cinema Admin</span>
+    </div>
+    
+    <nav class="admin-nav">
+      <a href="#" class="nav-item">
+        <i class="fa-solid fa-chart-line"></i> Dashboard
+      </a>
+      <a href="#" class="nav-item">
+        <i class="fa-solid fa-video"></i> Quản lý Phim
+      </a>
+      <a href="#" class="nav-item" routerLink="/admin/theaters">
+        <i class="fa-solid fa-building"></i> Quản lý Rạp
+      </a>
+      <a href="#" class="nav-item" routerLink="/admin/shows">
+        <i class="fa-solid fa-calendar-alt"></i> Lịch chiếu
+      </a>
+      <a href="#" class="nav-item active" routerLink="/admin/customers">
+        <i class="fa-solid fa-users"></i> Khách hàng
+      </a>
+      <a href="#" class="nav-item" routerLink="/admin/reports">
+        <i class="fa-solid fa-file-invoice-dollar"></i> Báo cáo doanh thu
+      </a>
+    </nav>
+    
+    <div class="sidebar-footer">
+      <a href="#" class="nav-item" routerLink="/">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i> Về trang chủ
+      </a>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <header class="admin-header">
+      <div class="header-search">
+        <i class="fa-solid fa-search"></i>
+        <input type="text" placeholder="Tìm kiếm tài khoản..." />
+      </div>
+      <div class="header-actions">
+        <div class="admin-user">
+          <img src="https://ui-avatars.com/api/?name=Admin&background=7c3aed&color=fff" alt="Admin" class="avatar" />
+          <span>Admin</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="admin-content">
+      <div class="page-header">
+        <h2>Quản lý Khách hàng</h2>
+        <button class="primary-btn" (click)="openAddModal()"><i class="fa-solid fa-user-plus"></i> Thêm Tài Khoản</button>
+      </div>
+
+      <div class="content-table-wrapper">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Tên / Email</th>
+              <th>Tuổi / Giới tính</th>
+              <th>Địa chỉ</th>
+              <th>Vai trò</th>
+              <th>Trạng thái</th>
+              <th>Hành động</th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (isLoading) {
+              <tr>
+                <td colspan="7" style="text-align: center; padding: 20px;">Đang tải dữ liệu khách hàng...</td>
+              </tr>
+            } @else if (users.length === 0) {
+              <tr>
+                <td colspan="7" style="text-align: center; padding: 20px;">Không có tài khoản nào.</td>
+              </tr>
+            } @else {
+              @for (user of users; track user.id) {
+                <tr>
+                  <td>#{{ user.id }}</td>
+                  <td>
+                    <strong>{{ user.name }}</strong><br>
+                    <span style="font-size: 0.85em; color: #64748b;">{{ user.email }}</span>
+                  </td>
+                  <td>
+                    {{ user.age || 'N/A' }} <br>
+                    <span style="font-size: 0.85em; color: #64748b;">{{ user.gender || 'N/A' }}</span>
+                  </td>
+                  <td>{{ user.address || 'N/A' }}</td>
+                  <td>
+                    @for (role of user.roles; track role) {
+                        <span class="status-badge" style="background:#f1f5f9; color:#475569; border: 1px solid #cbd5e1; margin-right: 4px;">{{ role }}</span>
+                    }
+                  </td>
+                  <td>
+                    @if (user.isActive) {
+                      <span class="status-badge valid" style="background: #ecfdf5; color: #10b981;">Đang Hoạt Động</span>
+                    } @else {
+                      <span class="status-badge error" style="background: #fef2f2; color: #ef4444;">Đã Khóa</span>
+                    }
+                  </td>
+                  <td>
+                    <button class="action-btn edit" title="Đổi mật khẩu" (click)="openPasswordModal(user)">
+                      <i class="fa-solid fa-key" style="color: #f59e0b;"></i>
+                    </button>
+                    <button class="action-btn edit" [title]="user.isActive ? 'Khóa tài khoản' : 'Mở khóa'" (click)="toggleLock(user)">
+                      <i class="fa-solid" [ngClass]="user.isActive ? 'fa-lock-open' : 'fa-lock'" [style.color]="user.isActive ? '#10b981' : '#ef4444'"></i>
+                    </button>
+                    <button class="action-btn delete" title="Xóa vĩnh viễn" (click)="deleteUser(user)">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+@if (showAddModal) {
+<div class="modal-overlay" (click)="closeAddModal()">
+  <div class="modal-content" style="max-width: 600px;" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Thêm Tài Khoản Mới</h3>
+      <button class="modal-close-btn" (click)="closeAddModal()">&times;</button>
+    </div>
+
+    <form (ngSubmit)="onSubmit()">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tên hiển thị</label>
+          <input type="text" class="form-input" [(ngModel)]="newUserData.name" name="name" required placeholder="Nguyen Van A">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" class="form-input" [(ngModel)]="newUserData.email" name="email" required placeholder="example@mail.com">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Mật khẩu</label>
+          <input type="password" class="form-input" [(ngModel)]="newUserData.password" name="password" required placeholder="********">
+        </div>
+        <div class="form-group">
+          <label>Phân quyền (Role)</label>
+          <select class="form-select" [(ngModel)]="newUserData.roles" name="roles" required>
+            <option value="CUSTOMER">Khách hàng (CUSTOMER)</option>
+            <option value="ADMIN">Quản trị viên (ADMIN)</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group" style="flex: 1;">
+          <label>Tuổi</label>
+          <input type="number" class="form-input" [(ngModel)]="newUserData.age" name="age" placeholder="25">
+        </div>
+        <div class="form-group" style="flex: 2;">
+          <label>Giới tính</label>
+          <select class="form-select" [(ngModel)]="newUserData.gender" name="gender">
+            <option value="MALE">Nam</option>
+            <option value="FEMALE">Nữ</option>
+            <option value="OTHER">Khác</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Số điện thoại</label>
+          <input type="text" class="form-input" [(ngModel)]="newUserData.mobileNo" name="mobileNo" placeholder="09xxxx">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>Địa chỉ</label>
+        <textarea class="form-textarea" [(ngModel)]="newUserData.address" name="address" placeholder="Nhập địa chỉ của khách hàng..."></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-cancel" (click)="closeAddModal()">Hủy</button>
+        <button type="submit" [disabled]="isSaving" class="primary-btn" style="border: none;">
+          {{ isSaving ? 'Đang xử lý...' : 'Tạo Tài Khoản' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+}
+
+@if (showPasswordModal) {
+<div class="modal-overlay" (click)="closePasswordModal()">
+  <div class="modal-content" style="max-width: 400px;" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Đổi Mật Khẩu</h3>
+      <button class="modal-close-btn" (click)="closePasswordModal()">&times;</button>
+    </div>
+
+    <form (ngSubmit)="submitPasswordChange()">
+      <div class="form-group">
+        <label>Mật khẩu mới</label>
+        <input type="password" class="form-input" [(ngModel)]="newPassword" name="newPassword" required placeholder="Nhập mật khẩu mới ít nhất 6 ký tự">
+      </div>
+      
+      <div class="form-actions" style="margin-top: 24px;">
+        <button type="button" class="btn-cancel" (click)="closePasswordModal()">Hủy</button>
+        <button type="submit" [disabled]="isSavingPassword || !newPassword" class="primary-btn" style="border: none;">
+          {{ isSavingPassword ? 'Đang lưu...' : 'Lưu Thay Đổi' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+}

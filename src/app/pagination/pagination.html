@@ -1,20 +1,26 @@
 <nav class="pagination-container">
-  <button class="page-nav-btn" disabled>
+  <button class="page-nav-btn" 
+          [disabled]="currentPage === 1" 
+          (click)="onPageClick(currentPage - 1)">
     <i class="fa-solid fa-arrow-left"></i>
-    Previous
+    Trang trước
   </button>
   
   <div class="page-numbers">
-    <button class="page-btn active">1</button>
-    <button class="page-btn">2</button>
-    <button class="page-btn">3</button>
-    <span class="page-ellipsis">&hellip;</span>
-    <button class="page-btn">9</button>
-    <button class="page-btn">10</button>
+    @for (page of pages; track page) {
+      <button 
+        class="page-btn" 
+        [class.active]="page === currentPage"
+        (click)="onPageClick(page)">
+        {{ page }}
+      </button>
+    }
   </div>
   
-  <button class="page-nav-btn next">
-    Next
+  <button class="page-nav-btn next" 
+          [disabled]="currentPage === totalPages"
+          (click)="onPageClick(currentPage + 1)">
+    Trang sau
     <i class="fa-solid fa-arrow-right"></i>
   </button>
 </nav>

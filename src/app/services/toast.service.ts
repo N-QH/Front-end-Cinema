@@ -14,14 +14,14 @@ export class ToastService {
   toastState$ = this.toastSubject.asObservable();
 
   showSuccess(message: string) {
-    this.toastSubject.next({ message, type: 'success' });
+    setTimeout(() => this.toastSubject.next({ message, type: 'success' }));
   }
 
   showError(message: string) {
-    this.toastSubject.next({ message, type: 'error' });
+    setTimeout(() => this.toastSubject.next({ message, type: 'error' }));
   }
 
   showInfo(message: string) {
-    this.toastSubject.next({ message, type: 'info' });
+    setTimeout(() => this.toastSubject.next({ message, type: 'info' }));
   }
 }

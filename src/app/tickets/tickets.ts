@@ -64,4 +64,17 @@ export class Tickets implements OnInit {
     if (!price) return '0đ';
     return new Intl.NumberFormat('vi-VN').format(price) + 'đ';
   }
+
+  rateTicket(ticketId: number, score: number) {
+    this.bookingService.rateTicket(ticketId, score).subscribe({
+      next: () => {
+        // Update local ticket state
+        const ticket = this.tickets.find(t => t.ticketId === ticketId);
+        if (ticket) {
+          ticket.rating = score;
+        }
+        this.cdr.detectChanges();
+      }
+    });
+  }
 }

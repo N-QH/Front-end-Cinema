@@ -11,7 +11,7 @@ import { AdminTheaters } from './admin-theaters/admin-theaters';
 import { AdminShows } from './admin-shows/admin-shows';
 import { Profile } from './profile/profile';
 import { Category } from './category/category';
-
+import { AdminCustomers } from './admin-customers/admin-customers';
 export const routes: Routes = [
   { path: '', component: Home },
   { path: 'category', component: Category },
@@ -24,5 +24,6 @@ export const routes: Routes = [
   { path: 'admin', component: Admin },
   { path: 'admin/theaters', component: AdminTheaters },
   { path: 'admin/shows', component: AdminShows },
-  { path: 'admin/reports', component: Reports }
+  { path: 'admin/reports', component: Reports },
+  { path: 'admin/customers', component: AdminCustomers }
 ];

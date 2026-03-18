@@ -21,13 +21,13 @@ export class Auth {
   loginData = { username: '', password: '' };
   registerData = { 
     name: '', 
-    emailId: '', 
+    email: '', 
     password: '', 
     mobileNo: '', 
     age: 18, 
     gender: 'MALE', 
     address: '', 
-    roles: 'USER' 
+    roles: 'CUSTOMER' 
   };
 
   constructor(
@@ -48,21 +48,29 @@ export class Auth {
   }
 
   onSubmit() {
-    this.isLoading = true;
-    this.error = null;
-    this.successMessage = null;
+    setTimeout(() => {
+      this.isLoading = true;
+      this.error = null;
+      this.successMessage = null;
+    });
 
     if (this.isLoginMode) {
       this.authService.login(this.loginData).subscribe({
         next: () => {
           this.router.navigate(['/']);
-          this.isLoading = false;
-          this.cdr.detectChanges();
+          setTimeout(() => {
+            this.isLoading = false;
+          });
         },
         error: (err) => {
-          this.error = 'Email hoặc mật khẩu không chính xác';
-          this.isLoading = false;
-          this.cdr.detectChanges();
+          setTimeout(() => {
+            if (err.error && typeof err.error === 'string' && err.error.includes("Tài khoản của bạn đã bị khóa")) {
+              this.error = "Tài khoản của bạn đã bị khóa, vui lòng liên hệ admin";
+            } else {
+              this.error = 'Email hoặc mật khẩu không chính xác';
+            }
+            this.isLoading = false;
+          });
         }
       });
     } else {
@@ -70,13 +78,17 @@ export class Auth {
         next: () => {
           this.toastService.showSuccess('Đăng ký thành công!');
           this.router.navigate(['/']);
-          this.isLoading = false;
+          setTimeout(() => {
+            this.isLoading = false;
+          });
         },
         error: (err) => {
           const errMsg = err.error || 'Đăng ký thất bại, vui lòng thử lại.';
           this.toastService.showError(errMsg);
-          this.error = errMsg;
-          this.isLoading = false;
+          setTimeout(() => {
+            this.error = errMsg;
+            this.isLoading = false;
+          });
         }
       });
     }

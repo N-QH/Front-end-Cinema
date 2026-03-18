@@ -35,6 +35,10 @@ export class BookingService {
     return this.http.get<any[]>(`${this.apiUrl}/ticket/user/${userId}`);
   }
 
+  rateTicket(ticketId: number, rating: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/ticket/${ticketId}/rate`, {}, { params: { rating: rating.toString() }, responseType: 'text' });
+  }
+
   // Admin: Theaters
   addTheater(theaterRequest: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/theater/addNew`, theaterRequest, { responseType: 'text' });

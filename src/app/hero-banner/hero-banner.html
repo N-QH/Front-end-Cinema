@@ -1,14 +1,45 @@
-<section class="hero-banner" routerLink="/movie/1" style="cursor: pointer;">
-  <div class="hero-content">
-    <h1 class="hero-title">Mưa đỏ</h1>
-    <span class="hero-age-rating">16+</span>
-    <button class="trailer-btn" (click)="$event.stopPropagation()">
-      <i class="fa-regular fa-calendar-days"></i>
-      Trailer
-    </button>
-  </div>
-  <!-- Abstract shapes -->
-  <div class="shape shape-1"></div>
-  <div class="shape shape-2"></div>
-  <div class="shape shape-3"></div>
-</section>
+@if (bannerMovies.length > 0) {
+  <section class="hero-banner-container">
+    @for (movie of bannerMovies; track movie.id; let i = $index) {
+      <div class="hero-banner" 
+           [class.active]="i === currentIndex"
+           [routerLink]="['/movie', movie.id]" 
+           style="cursor: pointer;">
+        <div class="banner-image" [style.backgroundImage]="'url(' + (movie.movieImage || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80') + ')'"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <div class="banner-tag">PHIM NỔI BẬT</div>
+          <h1 class="hero-title">{{ movie.movieName }}</h1>
+          <div class="hero-meta">
+            <span class="meta-item"><i class="fa-solid fa-star"></i> {{ movie.rating }}</span>
+            <span class="meta-item">{{ movie.genre }}</span>
+          </div>
+          <button class="trailer-btn" (click)="$event.stopPropagation()">
+            <i class="fa-solid fa-play"></i>
+            Chi tiết phim
+          </button>
+        </div>
+      </div>
+    }
+
+    @if (bannerMovies.length > 1) {
+      <button class="nav-arrow prev" (click)="prevBanner(); stopAutoSlide(); $event.stopPropagation()">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <button class="nav-arrow next" (click)="nextBanner(); stopAutoSlide(); $event.stopPropagation()">
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+
+      <div class="banner-dots">
+        @for (movie of bannerMovies; track movie.id; let i = $index) {
+          <span class="dot" [class.active]="i === currentIndex" (click)="setCurrentIndex(i); stopAutoSlide(); $event.stopPropagation()"></span>
+        }
+      </div>
+    }
+    
+    <!-- Decorative shapes -->
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </section>
+}

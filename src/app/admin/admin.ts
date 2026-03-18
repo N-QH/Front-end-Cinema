@@ -13,6 +13,10 @@ import { ToastService } from '../services/toast.service';
 })
 export class Admin implements OnInit {
   showAddModal = false;
+  showDeleteConfirm = false;
+  movieToDeleteId: number | null = null;
+  isEditing = false;
+  currentMovieId: number | null = null;
   isLoading = false;
   isFetching = true;
   message: string | null = null;
@@ -23,7 +27,6 @@ export class Admin implements OnInit {
   movieData = {
     movieName: '',
     duration: 120,
-    rating: 8.5,
     releaseDate: '2026-10-12',
     genre: 'ACTION',
     language: 'ENGLISH',
@@ -53,6 +56,26 @@ export class Admin implements OnInit {
   }
 
   openAddModal() {
+    this.isEditing = false;
+    this.currentMovieId = null;
+    this.resetForm();
+    this.showAddModal = true;
+    this.message = null;
+    this.error = null;
+  }
+
+  openEditModal(movie: any) {
+    this.isEditing = true;
+    this.currentMovieId = movie.id;
+    this.movieData = {
+      movieName: movie.movieName,
+      duration: movie.duration,
+      releaseDate: movie.releaseDate,
+      genre: movie.genre,
+      language: movie.language,
+      description: movie.description,
+      movieImage: movie.movieImage
+    };
     this.showAddModal = true;
     this.message = null;
     this.error = null;
@@ -60,6 +83,35 @@ export class Admin implements OnInit {
 
   closeAddModal() {
     this.showAddModal = false;
+    this.resetForm();
+  }
+
+  onDelete(movieId: number) {
+    this.movieToDeleteId = movieId;
+    this.showDeleteConfirm = true;
+    this.cdr.detectChanges();
+  }
+
+  cancelDelete() {
+    this.showDeleteConfirm = false;
+    this.movieToDeleteId = null;
+    this.cdr.detectChanges();
+  }
+
+  confirmDelete() {
+    if (this.movieToDeleteId) {
+      this.movieService.deleteMovie(this.movieToDeleteId).subscribe({
+        next: () => {
+          this.toastService.showSuccess('Xóa phim thành công!');
+          this.loadMovies();
+          this.cancelDelete();
+        },
+        error: (err) => {
+          this.toastService.showError('Xóa phim thất bại: ' + (err.error || 'Lỗi server'));
+          this.cancelDelete();
+        }
+      });
+    }
   }
 
   onSubmit() {
@@ -67,20 +119,51 @@ export class Admin implements OnInit {
     this.message = null;
     this.error = null;
 
-    this.movieService.addMovie(this.movieData).subscribe({
-      next: (res) => {
-        this.isLoading = false;
-        this.toastService.showSuccess('Thêm phim thành công!');
-        this.resetForm();
+    if (this.isEditing && this.currentMovieId) {
+      this.movieService.updateMovie(this.currentMovieId, this.movieData).subscribe({
+        next: (res) => {
+          this.handleSuccess('Cập nhật phim thành công!');
+        },
+        error: (err) => {
+          this.handleError(err, 'Cập nhật phim thất bại');
+        }
+      });
+    } else {
+      this.movieService.addMovie(this.movieData).subscribe({
+        next: (res) => {
+          this.handleSuccess('Thêm phim thành công!');
+        },
+        error: (err) => {
+          this.handleError(err, 'Thêm phim thất bại');
+        }
+      });
+    }
+  }
+
+  private handleSuccess(msg: string) {
+    this.isLoading = false;
+    this.toastService.showSuccess(msg);
+    this.resetForm();
+    this.loadMovies();
+    this.closeAddModal();
+    this.cdr.detectChanges();
+  }
+
+  private handleError(err: any, defaultMsg: string) {
+    this.isLoading = false;
+    this.error = err.error || defaultMsg;
+    this.toastService.showError(this.error!);
+    this.cdr.detectChanges();
+  }
+
+  setAsBanner(movieId: number) {
+    this.movieService.setMovieBanner(movieId).subscribe({
+      next: () => {
+        this.toastService.showSuccess('Đã đặt làm phim Banner!');
         this.loadMovies();
-        this.closeAddModal();
-        this.cdr.detectChanges();
       },
       error: (err) => {
-        this.isLoading = false;
-        this.error = err.error || 'Thêm phim thất bại';
-        this.toastService.showError(this.error!);
-        this.cdr.detectChanges();
+        this.toastService.showError('Cập nhật Banner thất bại: ' + (err.error || 'Lỗi server'));
       }
     });
   }
@@ -89,7 +172,6 @@ export class Admin implements OnInit {
     this.movieData = {
       movieName: '',
       duration: 120,
-      rating: 8.5,
       releaseDate: '2026-10-12',
       genre: 'ACTION',
       language: 'ENGLISH',

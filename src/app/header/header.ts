@@ -15,7 +15,9 @@ export class Header implements OnInit {
   constructor(public authService: AuthService, private router: Router, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
-    this.checkAdminRole();
+    this.authService.currentUser$.subscribe(() => {
+      this.checkAdminRole();
+    });
   }
 
   checkAdminRole() {
@@ -23,7 +25,7 @@ export class Header implements OnInit {
     if (email) {
       this.authService.getUserByEmail(email).subscribe({
         next: (user) => {
-          this.isAdmin = user?.roles?.includes('ROLE_ADMIN') || false;
+          this.isAdmin = user?.roles?.includes('ADMIN') || false;
           this.cdr.detectChanges();
         },
         error: () => this.isAdmin = false

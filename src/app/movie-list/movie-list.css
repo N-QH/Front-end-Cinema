@@ -4,10 +4,10 @@
   padding: 40px 20px;
 }
 
-.movie-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
+.movie-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0; /* MovieItem has its own padding/border */
   margin-bottom: 40px;
 }
 
@@ -16,23 +16,4 @@
   padding: 40px;
   color: var(--text-secondary);
   font-size: 1.1rem;
-  grid-column: 1 / -1;
-}
-
-@media (max-width: 1024px) {
-  .movie-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .movie-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 480px) {
-  .movie-grid {
-    grid-template-columns: 1fr;
-  }
 }

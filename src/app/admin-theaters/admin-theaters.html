@@ -19,7 +19,7 @@
       <a href="#" class="nav-item" routerLink="/admin/shows">
         <i class="fa-solid fa-calendar-alt"></i> Lịch chiếu
       </a>
-      <a href="#" class="nav-item">
+      <a href="#" class="nav-item" routerLink="/admin/customers">
         <i class="fa-solid fa-users"></i> Khách hàng
       </a>
       <a href="#" class="nav-item" routerLink="/admin/reports">
@@ -81,9 +81,6 @@
                   <td>{{ theater.name }}</td>
                   <td>{{ theater.address }}</td>
                   <td>
-                    <button class="action-btn edit" title="Chỉnh sửa ghế" (click)="openSeatEditor(theater)" style="margin-right: 8px;">
-                      <i class="fa-solid fa-chair"></i>
-                    </button>
                     <button class="action-btn delete" (click)="deleteTheater(theater.id)">
                       <i class="fa-solid fa-trash"></i>
                     </button>
@@ -118,6 +115,22 @@
       <div class="form-group">
         <label class="form-label">Địa chỉ</label>
         <input type="text" class="form-input" [(ngModel)]="theaterData.address" name="address" required placeholder="VD: 72 Lê Thánh Tôn, Q.1, TP.HCM">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Thành phố</label>
+          <input type="text" class="form-input" [(ngModel)]="theaterData.city" name="city" required placeholder="VD: TP. Hồ Chí Minh">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tỉnh / Thành</label>
+          <input type="text" class="form-input" [(ngModel)]="theaterData.state" name="state" required placeholder="VD: Quận 1">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Quốc gia</label>
+        <input type="text" class="form-input" [(ngModel)]="theaterData.country" name="country" required placeholder="VD: Việt Nam">
       </div>
 
       <!-- Seat Configuration Section -->
@@ -175,60 +188,4 @@
 </div>
 }
 
-<!-- Seat Editor Modal -->
-@if (showSeatEditor) {
-<div class="modal-overlay" (click)="closeSeatEditor()">
-  <div class="modal-content" (click)="$event.stopPropagation()" style="width: 800px; max-width: 95vw;">
-    <div class="modal-header">
-      <h3>Thiết kế Sơ đồ ghế: {{ selectedTheater?.name }}</h3>
-      <button class="modal-close-btn" (click)="closeSeatEditor()">&times;</button>
-    </div>
 
-    <div style="margin-bottom: 24px; padding: 16px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
-      <p style="margin: 0; font-size: 14px; color: #64748b;">
-        <i class="fa-solid fa-circle-info"></i> Click vào từng ghế để chuyển đổi giữa <strong>Ghế Thường (Classic)</strong> và <strong>Ghế cao cấp (Premium/VIP)</strong>.
-      </p>
-      <div style="display: flex; gap: 24px; margin-top: 12px;">
-        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px;">
-          <span style="width: 24px; height: 24px; background: #f3f4f6; border: 2px solid #d1d5db; border-radius: 4px; display: inline-block;"></span> 
-          <span>Ghế Thường</span>
-        </div>
-        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px;">
-          <span style="width: 24px; height: 24px; background: #fef3c7; border: 2px solid #fcd34d; border-radius: 4px; display: inline-block;"></span> 
-          <span>Ghế VIP 👑</span>
-        </div>
-      </div>
-    </div>
-
-    <div style="background: #1e293b; padding: 40px 20px; border-radius: 16px; margin-bottom: 24px; display: flex; flex-direction: column; align-items: center; overflow-x: auto;">
-      <div style="width: 400px; height: 4px; background: #94a3b8; border-radius: 4px; box-shadow: 0 4px 20px rgba(255,255,255,0.2); margin-bottom: 40px; text-align: center;">
-        <span style="color: #94a3b8; font-size: 10px; letter-spacing: 4px; position: relative; top: 12px;">MÀN HÌNH</span>
-      </div>
-
-      <div style="display: flex; flex-direction: column; gap: 8px;">
-        @for (row of seatRows; track row) {
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="color: #64748b; font-weight: bold; width: 30px; font-size: 12px;">{{ row }}</span>
-            @for (seat of getSeatsForRow(row); track seat.id) {
-              <button 
-                (click)="toggleSeatType(seat)"
-                style="width: 30px; height: 30px; border-radius: 6px; cursor: pointer; border: 2px solid; transition: all 0.2s;"
-                [style.background-color]="seat.seatType === 'PREMIUM' ? '#fef3c7' : '#f3f4f6'"
-                [style.border-color]="seat.seatType === 'PREMIUM' ? '#fcd34d' : '#d1d5db'"
-                [title]="seat.seatNo + ' (' + seat.seatType + ')'"
-              ></button>
-            }
-          </div>
-        }
-      </div>
-    </div>
-
-    <div class="form-actions">
-      <button type="button" (click)="closeSeatEditor()" class="form-btn-cancel">Hủy</button>
-      <button type="button" (click)="saveSeatChanges()" [disabled]="savingSeats" class="primary-btn" style="border: none;">
-        {{ savingSeats ? 'Đang lưu...' : 'Lưu sơ đồ ghế' }}
-      </button>
-    </div>
-  </div>
-</div>
-}
