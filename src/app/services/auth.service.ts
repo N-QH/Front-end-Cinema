@@ -94,5 +94,13 @@ export class AuthService {
   resetPassword(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/reset-password`, data, { responseType: 'text' });
   }
+
+  toggleOneTap(userId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${userId}/toggle-one-tap`, {}, { responseType: 'text' });
+  }
+
+  addPaymentMethod(userId: number, token: string | null): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${userId}/add-payment-method`, { token }, { responseType: 'text' });
+  }
 }
 

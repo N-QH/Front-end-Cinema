@@ -59,6 +59,10 @@ export class Reports implements OnInit, AfterViewInit {
   initRevenueChart() {
     if (this.revenueChart) this.revenueChart.destroy();
     
+    const isDark = document.body.classList.contains('dark-theme');
+    const labelColor = isDark ? '#94a3b8' : '#64748b';
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+
     const ctx = this.revenueChartCanvas.nativeElement.getContext('2d');
     this.revenueChart = new Chart(ctx, {
       type: 'bar',
@@ -70,7 +74,7 @@ export class Reports implements OnInit, AfterViewInit {
         datasets: [{
           label: 'Doanh thu (₫)',
           data: this.revenueData.map(d => d.revenue),
-          backgroundColor: 'rgba(124, 58, 237, 0.8)',
+          backgroundColor: '#7c3aed',
           borderRadius: 8,
           borderSkipped: false,
         }]
@@ -79,11 +83,25 @@ export class Reports implements OnInit, AfterViewInit {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { display: false }
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: isDark ? '#1e293b' : '#ffffff',
+            titleColor: isDark ? '#f8fafc' : '#1f2937',
+            bodyColor: isDark ? '#f8fafc' : '#1f2937',
+            borderColor: isDark ? '#334155' : '#e5e7eb',
+            borderWidth: 1
+          }
         },
         scales: {
-          y: { beginAtZero: true, grid: { display: false } },
-          x: { grid: { display: false } }
+          y: { 
+            beginAtZero: true, 
+            grid: { color: gridColor },
+            ticks: { color: labelColor }
+          },
+          x: { 
+            grid: { display: false },
+            ticks: { color: labelColor }
+          }
         }
       }
     });
@@ -92,6 +110,9 @@ export class Reports implements OnInit, AfterViewInit {
   initTheaterChart() {
     if (this.theaterChart) this.theaterChart.destroy();
     
+    const isDark = document.body.classList.contains('dark-theme');
+    const labelColor = isDark ? '#f8fafc' : '#1f2937';
+
     const ctx = this.theaterChartCanvas.nativeElement.getContext('2d');
     this.theaterChart = new Chart(ctx, {
       type: 'doughnut',
@@ -102,14 +123,18 @@ export class Reports implements OnInit, AfterViewInit {
           backgroundColor: [
             '#7c3aed', '#3b82f6', '#10b981', '#f59e0b', '#ef4444'
           ],
-          borderWidth: 0
+          borderWidth: isDark ? 2 : 0,
+          borderColor: isDark ? '#1e293b' : '#ffffff'
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { position: 'bottom' }
+          legend: { 
+            position: 'bottom',
+            labels: { color: labelColor }
+          }
         },
         cutout: '70%'
       }

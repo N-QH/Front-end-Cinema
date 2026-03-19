@@ -3,11 +3,22 @@
   --bg-color: #fcfcfc;
   --text-main: #1f2937;
   --text-muted: #6b7280;
-  --primary-color: #7c3aed; /* Purple for active tab, avatar, etc. */
+  --primary-color: #7c3aed;
   --primary-light: #ede9fe;
   --border-color: #e5e7eb;
   --search-bg: #f3f4f6;
   --card-bg: #ffffff;
+}
+
+.dark-theme {
+  --bg-color: #0f172a;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --primary-color: #8b5cf6;
+  --primary-light: #1e1b4b;
+  --border-color: #1e293b;
+  --search-bg: #1e293b;
+  --card-bg: #1e293b;
 }
 
 * {
@@ -45,4 +56,58 @@ a {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
+}
+
+/* Global Dark Mode Overrides for Components (Bypass View Encapsulation) */
+
+/* Booking Page */
+body.dark-theme .booking-footer {
+  background: #0f172a !important; /* Explicit slate-900 */
+  border-top: 1px solid #1e293b !important;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.4) !important;
+}
+
+body.dark-theme .summary-label {
+  color: #94a3b8 !important; /* Slate-400 */
+}
+
+body.dark-theme .summary-value {
+  color: #f8fafc !important; /* Slate-50 */
+}
+
+/* Revenue Reports */
+body.dark-theme .chart-card,
+body.dark-theme .top-movies-section {
+  background: #1e293b !important; /* Slate-800 */
+  border-color: #334155 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2) !important;
+}
+
+body.dark-theme .card-header h3,
+body.dark-theme .top-movies-section h3 {
+  color: #f8fafc !important;
+}
+
+body.dark-theme .report-table th,
+body.dark-theme .report-table td {
+  border-bottom-color: #334155 !important;
+}
+
+/* Specific Select & Button Overrides */
+body.dark-theme .report-select,
+body.dark-theme .export-btn,
+body.dark-theme .custom-select {
+  background-color: #1e293b !important; /* Slate-800 */
+  border-color: #334155 !important;
+  color: #f8fafc !important; /* Slate-50 - Bright white/gray text */
+}
+
+body.dark-theme .report-select option {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+body.dark-theme .export-btn:hover,
+body.dark-theme .custom-select:hover {
+  background-color: #334155 !important;
 }

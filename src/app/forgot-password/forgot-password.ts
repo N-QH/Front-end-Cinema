@@ -35,13 +35,13 @@ export class ForgotPassword {
     this.isLoading = true;
     this.cdr.detectChanges();
     this.authService.requestPasswordReset(this.email).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.isLoading = false;
         this.toastService.showSuccess(res || 'Mã OTP đã được gửi đến email của bạn');
         this.step = 2;
         this.cdr.detectChanges();
       },
-      error: (err) => {
+      error: (err: any) => {
         this.isLoading = false;
         const errorMsg = typeof err.error === 'string' ? err.error : (err.error?.message || 'Có lỗi xảy ra, vui lòng kiểm tra lại email.');
         this.toastService.showError(errorMsg);
@@ -63,13 +63,13 @@ export class ForgotPassword {
     this.isLoading = true;
     this.cdr.detectChanges();
     this.authService.resetPassword({ token: this.token, newPassword: this.newPassword }).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.isLoading = false;
         this.toastService.showSuccess('Đổi mật khẩu thành công! Hãy đăng nhập lại.');
         this.router.navigate(['/auth']);
         this.cdr.detectChanges();
       },
-      error: (err) => {
+      error: (err: any) => {
         this.isLoading = false;
         const errorMsg = typeof err.error === 'string' ? err.error : (err.error?.message || 'Lỗi khi xác minh mã OTP');
         this.toastService.showError(errorMsg);

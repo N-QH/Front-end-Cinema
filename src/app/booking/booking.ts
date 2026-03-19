@@ -34,6 +34,8 @@ export class Booking implements OnInit {
   selectedSeatNos: string[] = []; // Redundant but keeping consistent
   totalPrice = 0;
   userId: number | null = null;
+  isOneTapEnabled = false;
+  isBooking = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -59,6 +61,8 @@ export class Booking implements OnInit {
       this.authService.getUserByEmail(email).subscribe(user => {
         if (user && user.id) {
           this.userId = user.id;
+          this.isOneTapEnabled = !!user.isOneTapEnabled;
+          this.cdr.detectChanges();
         }
       });
     }
@@ -142,6 +146,30 @@ export class Booking implements OnInit {
     return new Intl.NumberFormat('vi-VN').format(price);
   }
 
+  toggleOneTap() {
+    if (!this.userId) {
+      this.toastService.showError("Vui lòng đăng nhập để sử dụng tính năng này!");
+      return;
+    }
+    this.authService.toggleOneTap(this.userId).subscribe({
+      next: (res) => {
+        this.isOneTapEnabled = !this.isOneTapEnabled;
+        this.toastService.showSuccess(res);
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        let errorMsg = err.error || "Không thể thay đổi cài đặt thanh toán";
+        
+        // Handle specific "no payment method" error from backend
+        if (typeof errorMsg === 'string' && errorMsg.includes('phương thức thanh toán')) {
+          this.toastService.showError("Bạn chưa có thẻ thanh toán. Vui lòng vào Cài đặt để thêm thẻ trước khi bật tính năng này!");
+        } else {
+          this.toastService.showError(errorMsg);
+        }
+      }
+    });
+  }
+
   onBook() {
     if (!this.selectedShowId || this.selectedSeats.length === 0) {
       this.toastService.showError("Vui lòng chọn suất chiếu và ghế ngồi!");
@@ -151,19 +179,42 @@ export class Booking implements OnInit {
     const selectedShow = this.shows.find(s => (s.showId || s.id) === this.selectedShowId);
     const selectedTheater = this.theaters.find(t => t.id === this.selectedTheaterId);
 
-    this.router.navigate(['/payment'], { 
-      state: { 
-        bookingInfo: {
-          movie: selectedShow?.movie,
-          theater: selectedTheater,
-          show: selectedShow,
-          seats: this.selectedSeats,
-          totalPrice: this.totalPrice,
-          showId: this.selectedShowId,
-          userId: this.userId
+    const bookingInfo = {
+      movie: selectedShow?.movie,
+      theater: selectedTheater,
+      show: selectedShow,
+      seats: this.selectedSeats,
+      totalPrice: this.totalPrice,
+      showId: this.selectedShowId,
+      userId: this.userId
+    };
+
+    if (this.isOneTapEnabled) {
+      this.isBooking = true;
+      this.cdr.detectChanges();
+      
+      const payload = {
+        showId: bookingInfo.showId,
+        userId: bookingInfo.userId,
+        requestSeats: bookingInfo.seats
+      };
+
+      this.bookingService.bookTicket(payload).subscribe({
+        next: (res) => {
+          this.toastService.showSuccess('Thanh toán thành công! Vé đã được đặt (1-Tap).');
+          this.router.navigate(['/tickets']);
+        },
+        error: (err) => {
+          this.isBooking = false;
+          this.toastService.showError('Thanh toán thất bại: ' + (err.error || 'Lỗi máy chủ'));
+          this.cdr.detectChanges();
         }
-      }
-    });
+      });
+    } else {
+      this.router.navigate(['/payment'], { 
+        state: { bookingInfo }
+      });
+    }
   }
 }
 

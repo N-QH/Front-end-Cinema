@@ -102,8 +102,22 @@
         <span class="summary-value total-price">{{ formatPrice(totalPrice) }}đ</span>
       </div>
     </div>
-    <button class="continue-btn" (click)="onBook()" [disabled]="!selectedShowId || selectedSeats.length === 0">
-      Tiếp tục thanh toán
-    </button>
+    
+    <div class="booking-actions">
+      <div class="one-tap-container" (click)="toggleOneTap()">
+        <div class="toggle-switch" [class.active]="isOneTapEnabled">
+          <div class="toggle-handle"></div>
+        </div>
+        <span class="one-tap-label">Thanh toán 1 chạm</span>
+      </div>
+
+      <button class="continue-btn" (click)="onBook()" [disabled]="!selectedShowId || selectedSeats.length === 0 || isBooking">
+        @if (isBooking) {
+          <i class="fa-solid fa-spinner fa-spin"></i> Đang xử lý...
+        } @else {
+          {{ isOneTapEnabled ? 'Đặt vé ngay (1-Tap)' : 'Tiếp tục thanh toán' }}
+        }
+      </button>
+    </div>
   </div>
 </div>

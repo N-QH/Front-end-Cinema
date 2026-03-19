@@ -13,6 +13,8 @@ import { Profile } from './profile/profile';
 import { Category } from './category/category';
 import { AdminCustomers } from './admin-customers/admin-customers';
 import { ForgotPassword } from './forgot-password/forgot-password';
+import { Settings } from './settings/settings';
+
 export const routes: Routes = [
   { path: '', component: Home },
   { path: 'category', component: Category },
@@ -23,6 +25,7 @@ export const routes: Routes = [
   { path: 'payment', component: Payment },
   { path: 'tickets', component: Tickets },
   { path: 'profile', component: Profile },
+  { path: 'settings', component: Settings },
   { path: 'admin', component: Admin },
   { path: 'admin/theaters', component: AdminTheaters },
   { path: 'admin/shows', component: AdminShows },

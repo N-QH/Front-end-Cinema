@@ -185,17 +185,17 @@
       <button class="modal-close-btn" (click)="closeSeatEditor()">&times;</button>
     </div>
 
-    <div style="margin-bottom: 24px; padding: 16px; background: #fffbeb; border-radius: 12px; border: 1px solid #fef3c7;">
-      <p style="margin: 0; font-size: 14px; color: #92400e;">
+    <div style="margin-bottom: 24px; padding: 16px; background: rgba(251, 191, 36, 0.1); border-radius: 12px; border: 1px solid rgba(251, 191, 36, 0.2);">
+      <p style="margin: 0; font-size: 14px; color: #fbbf24;">
         <i class="fa-solid fa-triangle-exclamation"></i> Chỉnh sửa tại đây chỉ áp dụng cho <strong>Suất chiếu này</strong>.
       </p>
       <div style="display: flex; gap: 24px; margin-top: 12px;">
-        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px;">
-          <span style="width: 24px; height: 24px; background: #f3f4f6; border: 2px solid #d1d5db; border-radius: 4px; display: inline-block;"></span> 
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-main);">
+          <span style="width: 24px; height: 24px; background: #334155; border: 2px solid #475569; border-radius: 4px; display: inline-block;"></span> 
           <span>Ghế Thường</span>
         </div>
-        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px;">
-          <span style="width: 24px; height: 24px; background: #fef3c7; border: 2px solid #fcd34d; border-radius: 4px; display: inline-block;"></span> 
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-main);">
+          <span style="width: 24px; height: 24px; background: rgba(251, 191, 36, 0.2); border: 2px solid #fbbf24; border-radius: 4px; display: inline-block;"></span> 
           <span>Ghế VIP 👑</span>
         </div>
       </div>
@@ -215,8 +215,8 @@
                 <button 
                   (click)="toggleSeatType(seat)"
                   style="width: 30px; height: 30px; border-radius: 6px; cursor: pointer; border: 2px solid; transition: all 0.2s;"
-                  [style.background-color]="(seat.theaterSeat?.seatType || seat.seatType) === 'PREMIUM' ? '#fef3c7' : '#f3f4f6'"
-                  [style.border-color]="(seat.theaterSeat?.seatType || seat.seatType) === 'PREMIUM' ? '#fcd34d' : '#d1d5db'"
+                  [style.background-color]="(seat.theaterSeat?.seatType || seat.seatType) === 'PREMIUM' ? 'rgba(251, 191, 36, 0.3)' : '#334155'"
+                  [style.border-color]="(seat.theaterSeat?.seatType || seat.seatType) === 'PREMIUM' ? '#fbbf24' : '#475569'"
                   [title]="(seat.theaterSeat?.seatNo || seat.seatNo) + ' - ' + ((seat.theaterSeat?.seatType || seat.seatType) === 'PREMIUM' ? 'VIP' : 'Thường') + ' - ' + formatPrice(seat.price)"
                 ></button>
               }
