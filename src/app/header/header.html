@@ -13,8 +13,37 @@
 
   <div class="header-right">
     <div class="search-bar">
-      <input type="text" placeholder="Search" />
+      <input type="text" 
+             placeholder="Search movies..." 
+             [value]="searchTerm"
+             (input)="onSearchInput($event)"
+             (focus)="onSearchInput($event)" />
       <i class="fa-solid fa-magnifying-glass search-icon"></i>
+
+      <!-- Search Suggestions Dropdown -->
+      @if (searchResults.length > 0 && searchTerm.length >= 2) {
+        <div class="search-results-dropdown">
+          <div class="search-results-list">
+            @for (movie of searchResults; track movie.id) {
+              <div class="search-result-item" (click)="goToMovie(movie.id)">
+                <div class="result-poster">
+                  <img [src]="movie.movieImage || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80'" alt="poster">
+                </div>
+                <div class="result-info">
+                  <div class="result-name">{{ movie.movieName }}</div>
+                  <div class="result-meta">
+                    <span class="result-rating"><i class="fa-solid fa-star"></i> {{ movie.rating || '0.0' }}</span>
+                    <span class="result-genre">{{ movie.genre }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+          <div class="search-footer">
+            Hiển thị {{ searchResults.length }} kết quả cho "{{ searchTerm }}"
+          </div>
+        </div>
+      }
     </div>
     
     @if (authService.currentUserValue) {

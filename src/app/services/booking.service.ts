@@ -81,5 +81,10 @@ export class BookingService {
   deleteShow(showId: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/show/${showId}`, { responseType: 'text' });
   }
+
+  // Movie Search
+  searchMovies(name: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/movie/search`, { params: { name } });
+  }
 }
 

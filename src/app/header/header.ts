@@ -2,6 +2,8 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../services/auth.service';
+import { BookingService } from '../services/booking.service';
+import { Subject, debounceTime, distinctUntilChanged, switchMap, of } from 'rxjs';
 
 @Component({
   selector: 'app-header',
@@ -11,12 +13,41 @@ import { AuthService } from '../services/auth.service';
 })
 export class Header implements OnInit {
   isAdmin = false;
+  searchTerm: string = '';
+  searchResults: any[] = [];
+  private searchSubject = new Subject<string>();
 
-  constructor(public authService: AuthService, private router: Router, private cdr: ChangeDetectorRef) {}
+  constructor(
+    public authService: AuthService, 
+    private router: Router, 
+    private cdr: ChangeDetectorRef,
+    private bookingService: BookingService
+  ) {}
 
   ngOnInit() {
     this.authService.currentUser$.subscribe(() => {
       this.checkAdminRole();
+    });
+
+    // Setup debounced search
+    this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(term => {
+        if (term.trim().length < 2) {
+          return of([]);
+        }
+        return this.bookingService.searchMovies(term);
+      })
+    ).subscribe({
+      next: (results) => {
+        this.searchResults = results;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.searchResults = [];
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -38,5 +69,21 @@ export class Header implements OnInit {
     this.authService.logout();
     this.isAdmin = false;
     this.router.navigate(['/']);
+  }
+
+  onSearchInput(event: any) {
+    this.searchTerm = event.target.value;
+    this.searchSubject.next(this.searchTerm);
+  }
+
+  clearSearch() {
+    this.searchTerm = '';
+    this.searchResults = [];
+    this.cdr.detectChanges();
+  }
+
+  goToMovie(movieId: number) {
+    this.clearSearch();
+    this.router.navigate(['/movie', movieId]);
   }
 }
