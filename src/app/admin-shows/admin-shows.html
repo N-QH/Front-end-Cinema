@@ -215,9 +215,9 @@
                 <button 
                   (click)="toggleSeatType(seat)"
                   style="width: 30px; height: 30px; border-radius: 6px; cursor: pointer; border: 2px solid; transition: all 0.2s;"
-                  [style.background-color]="(seat.theaterSeat?.seatType || seat.seatType) === 'PREMIUM' ? 'rgba(251, 191, 36, 0.3)' : '#334155'"
-                  [style.border-color]="(seat.theaterSeat?.seatType || seat.seatType) === 'PREMIUM' ? '#fbbf24' : '#475569'"
-                  [title]="(seat.theaterSeat?.seatNo || seat.seatNo) + ' - ' + ((seat.theaterSeat?.seatType || seat.seatType) === 'PREMIUM' ? 'VIP' : 'Thường') + ' - ' + formatPrice(seat.price)"
+                  [style.background-color]="(seat.seatType || seat.theaterSeat?.seatType) === 'PREMIUM' ? 'rgba(251, 191, 36, 0.3)' : '#334155'"
+                  [style.border-color]="(seat.seatType || seat.theaterSeat?.seatType) === 'PREMIUM' ? '#fbbf24' : '#475569'"
+                  [title]="(seat.theaterSeat?.seatNo || seat.seatNo) + ' - ' + ((seat.seatType || seat.theaterSeat?.seatType) === 'PREMIUM' ? 'VIP' : 'Thường') + ' - ' + formatPrice(seat.price)"
                 ></button>
               }
             </div>
@@ -231,6 +231,23 @@
       <button type="button" (click)="saveSeatChanges()" [disabled]="savingSeats" class="primary-btn" style="border: none;">
         {{ savingSeats ? 'Đang lưu...' : 'Lưu sơ đồ ghế' }}
       </button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Custom Delete Confirmation Modal -->
+@if (showDeleteConfirm) {
+<div class="modal-overlay confirm-modal" (click)="cancelDelete()">
+  <div class="modal-content confirm-box" (click)="$event.stopPropagation()">
+    <div class="confirm-icon">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+    </div>
+    <h3>Xác nhận xóa?</h3>
+    <p>Bạn có chắc chắn muốn xóa lịch chiếu này không?</p>
+    <div class="confirm-actions">
+      <button class="btn-cancel" (click)="cancelDelete()">Hủy</button>
+      <button class="btn-delete-confirm" (click)="confirmDelete()">Chắc chắn, Xóa</button>
     </div>
   </div>
 </div>

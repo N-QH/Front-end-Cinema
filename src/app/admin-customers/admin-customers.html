@@ -217,3 +217,20 @@
   </div>
 </div>
 }
+
+<!-- Custom Delete Confirmation Modal -->
+@if (showDeleteConfirm) {
+<div class="modal-overlay confirm-modal" (click)="cancelDelete()">
+  <div class="modal-content confirm-box" (click)="$event.stopPropagation()">
+    <div class="confirm-icon">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+    </div>
+    <h3>Xác nhận xóa tài khoản?</h3>
+    <p>Bạn có chắc chắn muốn xóa tài khoản {{ userToDelete?.email }} vĩnh viễn không?</p>
+    <div class="confirm-actions">
+      <button class="btn-cancel" (click)="cancelDelete()">Hủy</button>
+      <button class="btn-delete-confirm" (click)="confirmDelete()">Chắc chắn, Xóa</button>
+    </div>
+  </div>
+</div>
+}

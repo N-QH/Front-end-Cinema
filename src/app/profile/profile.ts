@@ -4,6 +4,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../services/auth.service';
 import { ToastService } from '../services/toast.service';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-profile',
@@ -14,6 +16,7 @@ import { ToastService } from '../services/toast.service';
 export class Profile implements OnInit {
   isLoading = true;
   isSaving = false;
+  isUploadingAvatar = false;
 
   userId = -1;
 
@@ -24,7 +27,8 @@ export class Profile implements OnInit {
     private authService: AuthService,
     private router: Router,
     private toastService: ToastService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private http: HttpClient
   ) {}
 
   ngOnInit() {
@@ -104,5 +108,28 @@ export class Profile implements OnInit {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  onProfileImageSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) {
+      this.isUploadingAvatar = true;
+      const formData = new FormData();
+      formData.append('file', file);
+      this.http.post<string>(`${environment.apiUrl}/upload/image`, formData, { responseType: 'text' as 'json' })
+        .subscribe({
+          next: (url) => {
+            this.userProfile.userImage = url;
+            this.isUploadingAvatar = false;
+            this.toastService.showSuccess('Cập nhật avatar thành công! Lưu lại để hoàn tất.');
+            this.cdr.detectChanges();
+          },
+          error: () => {
+            this.isUploadingAvatar = false;
+            this.toastService.showError('Tải ảnh lên thất bại!');
+            this.cdr.detectChanges();
+          }
+        });
+    }
   }
 }

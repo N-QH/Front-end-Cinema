@@ -14,7 +14,17 @@
       <div class="profile-card">
         
         <div class="profile-avatar-section">
-          <img [src]="userProfile.userImage || 'https://ui-avatars.com/api/?name=' + userProfile.name + '&background=7c3aed&color=fff'" alt="Avatar" class="profile-avatar" />
+          <div class="avatar-wrapper" style="position: relative; display: inline-block;">
+            <img [src]="userProfile.userImage || 'https://ui-avatars.com/api/?name=' + userProfile.name + '&background=7c3aed&color=fff'" alt="Avatar" class="profile-avatar" />
+            <input type="file" (change)="onProfileImageSelected($event)" accept="image/*" style="display: none;" #avatarInput>
+            <button type="button" class="btn-cancel" style="position: absolute; bottom: 0; right: 0; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; padding: 0; box-shadow: 0 4px 6px rgba(0,0,0,0.3); border: 2px solid var(--bg-card); cursor: pointer;" (click)="avatarInput.click()" title="Đổi ảnh đại diện">
+              @if (isUploadingAvatar) {
+                <i class="fa-solid fa-circle-notch fa-spin"></i>
+              } @else {
+                <i class="fa-solid fa-camera"></i>
+              }
+            </button>
+          </div>
           <h3 class="profile-name">{{ userProfile.name }}</h3>
           <p class="profile-role">
             {{ userProfile.roles?.includes('ADMIN') ? 'Quản trị viên' : 'Khách hàng' }} | ID: {{ userProfile.id }}
@@ -62,10 +72,7 @@
             <input type="password" [(ngModel)]="newPassword" name="newPassword" class="form-input" placeholder="Nhập phần mật khẩu muốn đổi" autocomplete="new-password">
           </div>
           
-          <div class="form-group">
-            <label>Ảnh đại diện (URL)</label>
-            <input type="text" [(ngModel)]="userProfile.userImage" name="userImage" class="form-input" placeholder="https://...">
-          </div>
+
 
           <div class="form-actions">
             <button type="submit" [disabled]="isSaving" class="primary-btn submit-btn">

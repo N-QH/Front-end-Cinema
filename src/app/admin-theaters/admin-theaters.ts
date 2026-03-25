@@ -119,15 +119,32 @@ export class AdminTheaters implements OnInit {
     this.seatData = { noOfSeatInRow: 10, noOfPremiumSeat: 20, noOfClassicSeat: 60 };
   }
 
-  deleteTheater(id: number) {
-    if (confirm('Bạn có chắc chắn muốn xóa rạp này?')) {
-      this.bookingService.deleteTheater(id).subscribe({
+  showDeleteConfirm = false;
+  theaterToDeleteId: number | null = null;
+
+  deleteTheater(theaterId: number) {
+    this.theaterToDeleteId = theaterId;
+    this.showDeleteConfirm = true;
+    this.cdr.detectChanges();
+  }
+
+  cancelDelete() {
+    this.showDeleteConfirm = false;
+    this.theaterToDeleteId = null;
+    this.cdr.detectChanges();
+  }
+
+  confirmDelete() {
+    if (this.theaterToDeleteId) {
+      this.bookingService.deleteTheater(this.theaterToDeleteId).subscribe({
         next: () => {
-          this.toastService.showSuccess('Đã xóa rạp thành công!');
+          this.toastService.showSuccess('Xóa rạp chiếu thành công!');
           this.loadTheaters();
+          this.cancelDelete();
         },
-        error: () => {
-          this.toastService.showError('Không thể xóa rạp này.');
+        error: (err) => {
+          this.toastService.showError('Xóa rạp thất bại: ' + (err.error || ''));
+          this.cancelDelete();
         }
       });
     }

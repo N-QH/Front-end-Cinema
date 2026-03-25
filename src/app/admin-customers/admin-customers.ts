@@ -74,15 +74,32 @@ export class AdminCustomers implements OnInit {
     });
   }
 
+  showDeleteConfirm = false;
+  userToDelete: any = null;
+
   deleteUser(user: any) {
-    if (confirm(`Bạn có chắc muốn xóa tài khoản ${user.email} vĩnh viễn không?`)) {
-      this.authService.deleteUser(user.id).subscribe({
-        next: (res) => {
-          this.toastService.showSuccess(res);
+    this.userToDelete = user;
+    this.showDeleteConfirm = true;
+    this.cdr.detectChanges();
+  }
+
+  cancelDelete() {
+    this.showDeleteConfirm = false;
+    this.userToDelete = null;
+    this.cdr.detectChanges();
+  }
+
+  confirmDelete() {
+    if (this.userToDelete) {
+      this.authService.deleteUser(this.userToDelete.id).subscribe({
+        next: () => {
+          this.toastService.showSuccess('Xóa người dùng thành công!');
           this.loadUsers();
+          this.cancelDelete();
         },
         error: (err) => {
-          this.toastService.showError(err.error || 'Lỗi xóa tài khoản');
+          this.toastService.showError('Lỗi xóa khách hàng: ' + (err?.error || err.message));
+          this.cancelDelete();
         }
       });
     }

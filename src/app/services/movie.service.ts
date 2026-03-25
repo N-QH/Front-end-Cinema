@@ -34,4 +34,16 @@ export class MovieService {
   deleteMovie(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`, { responseType: 'text' });
   }
+
+  uploadImage(file: File): Observable<string> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<string>(`${environment.apiUrl}/upload/image`, formData, { responseType: 'text' as 'json' });
+  }
+
+  uploadVideo(file: File): Observable<string> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<string>(`${environment.apiUrl}/upload/video`, formData, { responseType: 'text' as 'json' });
+  }
 }

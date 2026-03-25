@@ -168,6 +168,15 @@
           <label>Thời lượng (phút)</label>
           <input type="number" class="form-input" [(ngModel)]="movieData.duration" name="duration" required placeholder="120">
         </div>
+        <div class="form-group">
+          <label>Độ tuổi quy định</label>
+          <select class="form-input" [(ngModel)]="movieData.ageRequirement" name="ageRequirement">
+            <option [ngValue]="0">P (Mọi lứa tuổi)</option>
+            <option [ngValue]="13">13+ (Từ 13 tuổi)</option>
+            <option [ngValue]="16">16+ (Từ 16 tuổi)</option>
+            <option [ngValue]="18">18+ (Từ 18 tuổi)</option>
+          </select>
+        </div>
       </div>
 
       <div class="form-row">
@@ -196,6 +205,41 @@
         </div>
       </div>
 
+      <div class="form-row">
+        <div class="form-group">
+          <label>Đạo diễn</label>
+          <input type="text" class="form-input" [(ngModel)]="movieData.director" name="director" placeholder="Nhập tên đạo diễn">
+        </div>
+        <div class="form-group" style="flex: 2;">
+          <label>Diễn viên <button type="button" class="btn-cancel" style="padding: 2px 8px; font-size: 11px; margin-left: 8px" (click)="addActor()">+ Thêm</button></label>
+          @for (actor of movieData.actorsList; track $index) {
+            <div style="display: flex; gap: 8px; margin-bottom: 8px; align-items: center;">
+              <div class="actor-img-preview" style="width: 40px; height: 40px; border-radius: 50%; background: #334155; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; flex-shrink: 0;">
+                @if (movieData.actorsList[$index].imageUrl) {
+                  <img [src]="movieData.actorsList[$index].imageUrl" style="width: 100%; height: 100%; object-fit: cover;">
+                } @else {
+                  <i class="fa-solid fa-user" style="color: #64748b;"></i>
+                }
+                @if (uploadingActors[$index]) {
+                  <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-circle-notch fa-spin" style="color: white; font-size: 12px;"></i>
+                  </div>
+                }
+              </div>
+              <div style="position: relative; flex-shrink: 0;">
+                 <input type="file" (change)="onActorImageSelected($event, $index)" style="position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; left:0; top:0;" accept="image/*">
+                 <button type="button" class="btn-cancel" style="padding: 10px; border-radius: 8px;" title="Tải ảnh chân dung"><i class="fa-solid fa-upload"></i></button>
+              </div>
+              <input type="text" class="form-input" [(ngModel)]="movieData.actorsList[$index].name" name="actor_{{$index}}" placeholder="Tên diễn viên" style="flex: 1;">
+              <button type="button" class="btn-cancel" style="padding: 8px; border-radius: 8px;" (click)="removeActor($index)"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+          }
+          @if (movieData.actorsList.length === 0) {
+            <p style="color: var(--text-muted); font-size: 13px; margin: 0;">Chưa có diễn viên. Bấm "+ Thêm" để thêm.</p>
+          }
+        </div>
+      </div>
+
       <div class="form-group">
         <label>Ngày khởi chiếu</label>
         <input type="date" class="form-input" [(ngModel)]="movieData.releaseDate" name="releaseDate" required>
@@ -207,8 +251,43 @@
       </div>
 
       <div class="form-group">
-        <label>Link ảnh poster</label>
-        <input type="text" class="form-input" [(ngModel)]="movieData.movieImage" name="movieImage" placeholder="https://example.com/poster.jpg">
+        <label>Ảnh Poster</label>
+        <div style="display: flex; gap: 12px; align-items: flex-start;">
+          @if (movieData.movieImage) {
+            <img [src]="movieData.movieImage" style="width: 80px; height: 120px; object-fit: cover; border-radius: 8px; border: 1px solid #475569;">
+          }
+          <div style="flex: 1;">
+            <input type="file" (change)="onPosterSelected($event)" accept="image/*" style="display: none;" #posterInput>
+            <button type="button" class="form-input" (click)="posterInput.click()" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: var(--bg-card);">
+              <span style="color: var(--text-muted)">{{ movieData.movieImage ? 'Đã chọn ảnh' : 'Chọn file ảnh...' }}</span>
+              @if (isUploadingPoster) {
+                <i class="fa-solid fa-circle-notch fa-spin"></i>
+              } @else {
+                <i class="fa-solid fa-upload"></i>
+              }
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Video Trailer</label>
+        <div style="display: flex; gap: 12px; align-items: flex-start;">
+          @if (movieData.trailerUrl) {
+            <video [src]="getSafeTrailerUrl()" [poster]="movieData.movieImage || ''" style="width: 160px; height: 90px; object-fit: cover; border-radius: 8px; border: 1px solid #475569;" controls></video>
+          }
+          <div style="flex: 1;">
+            <input type="file" (change)="onTrailerSelected($event)" accept="video/*" style="display: none;" #trailerInput>
+            <button type="button" class="form-input" (click)="trailerInput.click()" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: var(--bg-card);">
+              <span style="color: var(--text-muted)">{{ movieData.trailerUrl ? 'Đã chọn video' : 'Chọn file video...' }}</span>
+              @if (isUploadingTrailer) {
+                <i class="fa-solid fa-circle-notch fa-spin"></i>
+              } @else {
+                <i class="fa-solid fa-upload"></i>
+              }
+            </button>
+          </div>
+        </div>
       </div>
 
       <div class="form-actions">

@@ -25,6 +25,10 @@ export class Booking implements OnInit {
   theaters: any[] = [];
   shows: any[] = [];
   
+  availableDates: string[] = [];
+  selectedDate: string | null = null;
+  showsForSelectedDate: any[] = [];
+  
   selectedTheaterId: number | null = null;
   selectedShowId: number | null = null;
   
@@ -71,16 +75,59 @@ export class Booking implements OnInit {
   loadBookingData() {
     this.bookingService.getTheaters().subscribe(res => {
       this.theaters = res;
-      if (this.theaters.length > 0) this.selectedTheaterId = this.theaters[0].id;
+      if (this.theaters.length > 0) this.onTheaterChange(this.theaters[0].id);
       this.cdr.detectChanges();
     });
 
     if (this.movieId) {
       this.bookingService.getShowsByMovieId(this.movieId).subscribe(res => {
         this.shows = res;
+        this.updateAvailableDates();
         this.cdr.detectChanges();
       });
     }
+  }
+
+  onTheaterChange(theaterId: number) {
+    this.selectedTheaterId = theaterId;
+    this.updateAvailableDates();
+  }
+
+  updateAvailableDates() {
+    if (!this.selectedTheaterId || this.shows.length === 0) {
+      this.availableDates = [];
+      this.selectedDate = null;
+      this.showsForSelectedDate = [];
+      return;
+    }
+
+    const theaterShows = this.shows.filter(s => (s.theater?.id === this.selectedTheaterId));
+    // Fallback if shows don't have theater populated in frontend DTO, but they typically should.
+    const relevantShows = theaterShows.length > 0 ? theaterShows : this.shows;
+
+    const tempDates = new Set<string>();
+    relevantShows.forEach(s => tempDates.add(s.showDate));
+    
+    this.availableDates = Array.from(tempDates).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+    
+    if (this.availableDates.length > 0) {
+      this.selectDate(this.availableDates[0], relevantShows);
+    } else {
+      this.selectedDate = null;
+      this.showsForSelectedDate = [];
+      this.selectedShowId = null;
+    }
+    this.cdr.detectChanges();
+  }
+
+  selectDate(d: string, relevantShows: any[] = this.shows) {
+    this.selectedDate = d;
+    this.showsForSelectedDate = relevantShows.filter(s => s.showDate === d);
+    this.selectedShowId = null; 
+    this.seats = [];
+    this.selectedSeats = [];
+    this.totalPrice = 0;
+    this.cdr.detectChanges();
   }
 
   selectShow(show: any) {
@@ -93,7 +140,7 @@ export class Booking implements OnInit {
       this.seats = show.showSeatList.map((s: any) => ({
         id: s.id,
         seatNo: s.theaterSeat?.seatNo || s.seatNo,
-        type: s.theaterSeat?.seatType || s.seatType,
+        type: s.seatType || s.theaterSeat?.seatType,
         price: s.price,
         occupied: !s.isAvailable
       }));

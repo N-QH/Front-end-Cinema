@@ -12,7 +12,7 @@
       
       <div class="filter-group">
         <h3>1. Chọn rạp</h3>
-        <select class="custom-select" [(ngModel)]="selectedTheaterId">
+        <select class="custom-select" [(ngModel)]="selectedTheaterId" (ngModelChange)="onTheaterChange($event)">
           <option [ngValue]="null">-- Chọn rạp --</option>
           @for (theater of theaters; track theater.id) {
             <option [ngValue]="theater.id">{{ theater.name }} - {{ theater.address }}</option>
@@ -21,31 +21,47 @@
       </div>
 
       <div class="filter-group">
-        <h3>2. Chọn suất chiếu</h3>
+        <h3>2. Chọn ngày chiếu</h3>
         
         <div class="time-selector" style="margin-top: 15px;">
-          @if (shows.length === 0) {
-            <p style="color: var(--text-secondary); font-size: 14px;">Không có suất chiếu nào cho rạp này.</p>
+          @if (availableDates.length === 0) {
+            <p style="color: var(--text-secondary); font-size: 14px;">Không có lịch chiếu nào cho rạp này.</p>
           } @else {
-            @for (show of shows; track show.showId || show.id) {
+            @for (date of availableDates; track date) {
               <button 
                 class="time-btn" 
-                [class.active]="selectedShowId === (show.showId || show.id)"
-                (click)="selectShow(show)"
+                [class.active]="selectedDate === date"
+                (click)="selectDate(date)"
               >
-                {{ show.showTime }} <br/>
-                <small style="font-size: 11px;">Phòng {{ show.screenNumber || '?' }}</small><br/>
-                <small style="font-size: 10px;">{{ show.showDate | date:'dd/MM' }}</small>
+                {{ date | date:'dd/MM/yyyy' }}
               </button>
             }
           }
         </div>
       </div>
+
+      @if (selectedDate) {
+        <div class="filter-group">
+          <h3>3. Chọn suất chiếu</h3>
+          <div class="time-selector" style="margin-top: 15px;">
+            @for (show of showsForSelectedDate; track show.showId || show.id) {
+              <button 
+                class="time-btn" 
+                [class.active]="selectedShowId === (show.showId || show.id)"
+                (click)="selectShow(show)"
+              >
+                {{ show.showTime | slice:0:5 }} <br/>
+                <small style="font-size: 11px;">Phòng {{ show.screenNumber || '?' }}</small>
+              </button>
+            }
+          </div>
+        </div>
+      }
       
     </div>
 
     <div class="seat-map-panel">
-      <h3>3. Chọn ghế</h3>
+      <h3>4. Chọn ghế</h3>
       
       <div class="screen-container">
         <div class="screen"></div>

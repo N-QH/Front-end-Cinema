@@ -133,13 +133,11 @@ export class AdminShows implements OnInit {
   }
 
   toggleSeatType(seat: any) {
-    const currentType = seat.theaterSeat?.seatType || seat.seatType;
+    const currentType = seat.seatType || seat.theaterSeat?.seatType;
     if (currentType === 'STANDARD') {
-      if (seat.theaterSeat) seat.theaterSeat.seatType = 'PREMIUM';
       seat.seatType = 'PREMIUM';
       seat.price = this.seatPricing.priceOfPremiumSeat;
     } else {
-      if (seat.theaterSeat) seat.theaterSeat.seatType = 'STANDARD';
       seat.seatType = 'STANDARD';
       seat.price = this.seatPricing.priceOfClassicSeat;
     }
@@ -242,15 +240,32 @@ export class AdminShows implements OnInit {
     };
   }
 
-  deleteShow(id: number) {
-    if (confirm('Bạn có chắc chắn muốn xóa lịch chiếu này?')) {
-      this.bookingService.deleteShow(id).subscribe({
+  showDeleteConfirm = false;
+  showToDeleteId: number | null = null;
+
+  deleteShow(showId: number) {
+    this.showToDeleteId = showId;
+    this.showDeleteConfirm = true;
+    this.cdr.detectChanges();
+  }
+
+  cancelDelete() {
+    this.showDeleteConfirm = false;
+    this.showToDeleteId = null;
+    this.cdr.detectChanges();
+  }
+
+  confirmDelete() {
+    if (this.showToDeleteId) {
+      this.bookingService.deleteShow(this.showToDeleteId).subscribe({
         next: () => {
-          this.toastService.showSuccess('Đã xóa lịch chiếu thành công!');
+          this.toastService.showSuccess('Xóa suất chiếu thành công!');
           this.loadShows();
+          this.cancelDelete();
         },
-        error: () => {
-          this.toastService.showError('Không thể xóa suất chiếu này.');
+        error: (err) => {
+          this.toastService.showError('Xóa suất chiếu thất bại!');
+          this.cancelDelete();
         }
       });
     }

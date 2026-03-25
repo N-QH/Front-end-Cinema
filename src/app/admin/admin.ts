@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { MovieService } from '../services/movie.service';
 import { ToastService } from '../services/toast.service';
 import { AdminService } from '../services/admin.service';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-admin',
@@ -38,7 +39,11 @@ export class Admin implements OnInit {
     genres: [] as string[],
     language: 'ENGLISH',
     description: '',
-    movieImage: ''
+    movieImage: '',
+    director: '',
+    actorsList: [] as {name: string, imageUrl: string}[],
+    trailerUrl: '',
+    ageRequirement: 0
   };
 
   allGenres = [
@@ -51,8 +56,16 @@ export class Admin implements OnInit {
     private movieService: MovieService, 
     private cdr: ChangeDetectorRef, 
     private toastService: ToastService,
-    private adminService: AdminService
+    private adminService: AdminService,
+    private sanitizer: DomSanitizer
   ) {}
+
+  getSafeTrailerUrl(): SafeResourceUrl | null {
+    if (this.movieData.trailerUrl) {
+      return this.sanitizer.bypassSecurityTrustResourceUrl(this.movieData.trailerUrl);
+    }
+    return null;
+  }
 
   ngOnInit() {
     this.loadMovies();
@@ -105,7 +118,18 @@ export class Admin implements OnInit {
       genres: movie.genre ? movie.genre.split(',').map((g: string) => g.trim()) : [],
       language: movie.language,
       description: movie.description,
-      movieImage: movie.movieImage
+      movieImage: movie.movieImage,
+      director: movie.director || '',
+      actorsList: (() => {
+        try {
+          const parsed = JSON.parse(movie.actors);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+          return movie.actors ? movie.actors.split(',').map((a: string) => ({ name: a.trim(), imageUrl: '' })) : [];
+        }
+      })(),
+      trailerUrl: movie.trailerUrl || '',
+      ageRequirement: movie.ageRequirement || 0
     };
     this.showAddModal = true;
     this.message = null;
@@ -123,6 +147,14 @@ export class Admin implements OnInit {
 
   isGenreSelected(genre: string): boolean {
     return this.movieData.genres.includes(genre);
+  }
+
+  addActor() {
+    this.movieData.actorsList.push({ name: '', imageUrl: '' });
+  }
+
+  removeActor(index: number) {
+    this.movieData.actorsList.splice(index, 1);
   }
 
   closeAddModal() {
@@ -165,7 +197,8 @@ export class Admin implements OnInit {
 
     const payload = {
       ...this.movieData,
-      genre: this.movieData.genres.join(',')
+      genre: this.movieData.genres.join(','),
+      actors: JSON.stringify(this.movieData.actorsList.filter(a => a.name && a.name.trim() !== ''))
     };
 
     if (this.isEditing && this.currentMovieId) {
@@ -225,7 +258,74 @@ export class Admin implements OnInit {
       genres: [],
       language: 'ENGLISH',
       description: '',
-      movieImage: ''
+      movieImage: '',
+      director: '',
+      actorsList: [],
+      trailerUrl: '',
+      ageRequirement: 0
     };
+  }
+
+  isUploadingPoster = false;
+  isUploadingTrailer = false;
+  uploadingActors: { [index: number]: boolean } = {};
+
+  onPosterSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) {
+      this.isUploadingPoster = true;
+      this.movieService.uploadImage(file).subscribe({
+        next: (url) => {
+          this.movieData.movieImage = url;
+          this.isUploadingPoster = false;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.isUploadingPoster = false;
+          this.toastService.showError('Tải ảnh lên thất bại!');
+          this.cdr.detectChanges();
+        }
+      });
+    }
+  }
+
+  onTrailerSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) {
+      this.isUploadingTrailer = true;
+      this.toastService.showSuccess('Đang tải video lên, vui lòng đợi...');
+      this.movieService.uploadVideo(file).subscribe({
+        next: (url) => {
+          this.movieData.trailerUrl = url;
+          this.isUploadingTrailer = false;
+          this.toastService.showSuccess('Tải video thành công!');
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          this.isUploadingTrailer = false;
+          this.toastService.showError('Tải video thất bại: ' + (err.error || 'Lỗi server'));
+          this.cdr.detectChanges();
+        }
+      });
+    }
+  }
+
+  onActorImageSelected(event: Event, index: number) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) {
+      this.uploadingActors[index] = true;
+      this.movieService.uploadImage(file).subscribe({
+        next: (url) => {
+          this.movieData.actorsList[index].imageUrl = url;
+          this.uploadingActors[index] = false;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.uploadingActors[index] = false;
+          this.toastService.showError('Tải ảnh diễn viên lên thất bại!');
+          this.cdr.detectChanges();
+        }
+      });
+    }
   }
 }

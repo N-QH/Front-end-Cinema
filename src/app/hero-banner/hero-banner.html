@@ -14,7 +14,7 @@
             <span class="meta-item"><i class="fa-solid fa-star"></i> {{ movie.rating }}</span>
             <span class="meta-item">{{ movie.genre }}</span>
           </div>
-          <button class="trailer-btn" (click)="$event.stopPropagation()">
+          <button class="trailer-btn" [routerLink]="['/movie', movie.id]" (click)="$event.stopPropagation()">
             <i class="fa-solid fa-play"></i>
             Chi tiết phim
           </button>

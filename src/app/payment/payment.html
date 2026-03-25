@@ -64,7 +64,7 @@
         <div class="ticket-movie">
           <div class="ticket-poster placeholder-poster"><i class="fa-solid fa-image"></i></div>
           <div class="ticket-details">
-            <span class="age-badge">16+</span>
+            <span class="age-badge">{{ bookingInfo.movie.ageRequirement ? bookingInfo.movie.ageRequirement + '+' : 'P' }}</span>
             <h4>{{ bookingInfo.movie?.movieName }}</h4>
             <p>2D Phụ đề Tiếng Việt</p>
           </div>
