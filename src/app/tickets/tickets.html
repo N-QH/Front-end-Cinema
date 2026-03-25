@@ -26,8 +26,12 @@
         @for (ticket of tickets; track ticket.ticketId) {
           <div class="ticket-stub-card">
             <div class="ticket-visual">
-              <div class="movie-poster placeholder-poster">
-                <i class="fa-solid fa-film"></i>
+              <div class="movie-poster">
+                @if (ticket.show?.movie?.movieImage) {
+                  <img [src]="ticket.show.movie.movieImage" [alt]="ticket.show.movie.movieName">
+                } @else {
+                  <div class="placeholder-poster"><i class="fa-solid fa-film"></i></div>
+                }
               </div>
             </div>
 
@@ -39,15 +43,15 @@
               <div class="info-grid">
                 <div class="info-group">
                   <span class="label">Ngày chiếu</span>
-                  <span class="value">{{ ticket.show?.date | date:'dd/MM/yyyy' }}</span>
+                  <span class="value">{{ ticket.show?.showDate | date:'dd/MM/yyyy' }}</span>
                 </div>
                 <div class="info-group">
                   <span class="label">Giờ chiếu</span>
-                  <span class="value">{{ ticket.show?.time | slice:0:5 }}</span>
+                  <span class="value">{{ ticket.show?.showTime | slice:0:5 }}</span>
                 </div>
                 <div class="info-group">
                   <span class="label">Ghế</span>
-                  <span class="value">{{ ticket.bookedSeats }}</span>
+                  <span class="value">{{ ticket.bookedSeats || 'N/A' }}</span>
                 </div>
                 <div class="info-group">
                   <span class="label">Tổng tiền</span>

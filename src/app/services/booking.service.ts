@@ -39,6 +39,15 @@ export class BookingService {
     return this.http.put(`${this.apiUrl}/ticket/${ticketId}/rate`, {}, { params: { rating: rating.toString() }, responseType: 'text' });
   }
 
+  // Seat Reservations
+  holdSeats(ticketRequest: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/ticket/hold`, ticketRequest, { responseType: 'text' });
+  }
+
+  releaseSeats(ticketRequest: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/ticket/release`, ticketRequest, { responseType: 'text' });
+  }
+
   // Admin: Theaters
   addTheater(theaterRequest: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/theater/addNew`, theaterRequest, { responseType: 'text' });

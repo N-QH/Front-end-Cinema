@@ -137,13 +137,27 @@ export class Booking implements OnInit {
     
     // Load seats for this show
     if (show.showSeatList) {
-      this.seats = show.showSeatList.map((s: any) => ({
-        id: s.id,
-        seatNo: s.theaterSeat?.seatNo || s.seatNo,
-        type: s.seatType || s.theaterSeat?.seatType,
-        price: s.price,
-        occupied: !s.isAvailable
-      }));
+      this.seats = show.showSeatList.map((s: any) => {
+        let isOccupied = !s.isAvailable;
+        
+        // Handle temporary seat held mechanism
+        if (s.isAvailable && s.heldUntil) {
+          const holdTime = new Date(s.heldUntil).getTime();
+          const now = new Date().getTime();
+          // If the seat is held by someone else and the hold hasn't expired
+          if (now < holdTime && s.heldByUserId !== this.userId) {
+            isOccupied = true;
+          }
+        }
+
+        return {
+          id: s.id,
+          seatNo: s.theaterSeat?.seatNo || s.seatNo,
+          type: s.seatType || s.theaterSeat?.seatType,
+          price: s.price,
+          occupied: isOccupied
+        };
+      });
       
       // Organize into rows by numeric prefix (seatNo format: "1A", "2B", etc.)
       const rowsSet = new Set<string>();
@@ -253,13 +267,37 @@ export class Booking implements OnInit {
         },
         error: (err) => {
           this.isBooking = false;
-          this.toastService.showError('Thanh toán thất bại: ' + (err.error || 'Lỗi máy chủ'));
+          this.toastService.showError('Thanh toán thất bại: ' + (err.error || 'Lỗi máy chủ / Ghế trống không hợp lệ'));
+          this.loadBookingData(); // Refresh seat grid
           this.cdr.detectChanges();
         }
       });
     } else {
-      this.router.navigate(['/payment'], { 
-        state: { bookingInfo }
+      this.isBooking = true;
+      this.cdr.detectChanges();
+
+      const payload = {
+        showId: bookingInfo.showId,
+        userId: bookingInfo.userId,
+        requestSeats: bookingInfo.seats
+      };
+
+      // Proceed to normal checkout by initiating a 5-minute hold on the seats
+      this.bookingService.holdSeats(payload).subscribe({
+        next: (res: string) => {
+          // res is now the epoch milliseconds string from backend
+          sessionStorage.setItem('seatHoldEndTime', res);
+          this.isBooking = false;
+          this.router.navigate(['/payment'], { 
+            state: { bookingInfo }
+          });
+        },
+        error: (err) => {
+          this.isBooking = false;
+          this.toastService.showError('Ghế đã bị người khác chọn hoặc đang được giữ. Vui lòng chọn lại!');
+          this.loadBookingData(); // Refresh seat grid dynamically
+          this.cdr.detectChanges();
+        }
       });
     }
   }

@@ -48,8 +48,16 @@ export class Tickets implements OnInit {
   loadTickets() {
     if (!this.userId) return;
     this.bookingService.getUserTickets(this.userId).subscribe({
-      next: (res) => {
-        this.tickets = res;
+      next: (res: any[]) => {
+        // Post-process tickets to format seat numbers into a string
+        this.tickets = res.map(ticket => {
+          if (ticket.showSeats && Array.isArray(ticket.showSeats)) {
+            ticket.bookedSeats = ticket.showSeats
+              .map((ss: any) => ss.theaterSeat?.seatNo || 'N/A')
+              .join(', ');
+          }
+          return ticket;
+        });
         this.isLoading = false;
         this.cdr.detectChanges();
       },

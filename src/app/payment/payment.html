@@ -1,10 +1,21 @@
 <div class="payment-container">
   <div class="payment-header">
-    <button class="back-btn" [routerLink]="['/booking', bookingInfo?.movie?.id]">
+    <button class="back-btn" (click)="cancelPayment()">
       <i class="fa-solid fa-arrow-left"></i> Quay lại
     </button>
     <h2>Thanh toán</h2>
     <div class="header-placeholder"></div>
+  </div>
+
+  <div class="timer-wrapper" *ngIf="bookingInfo && !holdExpired">
+    <div class="timer-banner">
+      <div class="timer-icon">
+        <i class="fa-regular fa-clock"></i>
+      </div>
+      <div class="timer-text">
+        Thời gian giữ ghế còn lại: <span class="timer-countdown">{{ timerString }}</span>
+      </div>
+    </div>
   </div>
 
   <div class="payment-content" *ngIf="bookingInfo; else noData">
