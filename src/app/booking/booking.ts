@@ -40,6 +40,7 @@ export class Booking implements OnInit {
   userId: number | null = null;
   isOneTapEnabled = false;
   isBooking = false;
+  showAuthModal = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -237,6 +238,11 @@ export class Booking implements OnInit {
       return;
     }
 
+    if (!this.userId) {
+      this.showAuthModal = true;
+      return;
+    }
+
     const selectedShow = this.shows.find(s => (s.showId || s.id) === this.selectedShowId);
     const selectedTheater = this.theaters.find(t => t.id === this.selectedTheaterId);
 
@@ -300,6 +306,14 @@ export class Booking implements OnInit {
         }
       });
     }
+  }
+
+  goToLogin() {
+    this.router.navigate(['/auth'], { queryParams: { returnUrl: `/booking/${this.movieId}` } });
+  }
+
+  goToRegister() {
+    this.router.navigate(['/auth'], { queryParams: { mode: 'register', returnUrl: `/booking/${this.movieId}` } });
   }
 }
 

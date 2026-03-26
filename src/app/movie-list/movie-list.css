@@ -7,7 +7,7 @@
 .movie-list-container {
   display: flex;
   flex-direction: column;
-  gap: 0; /* MovieItem has its own padding/border */
+  gap: 24px;
   margin-bottom: 40px;
 }
 

@@ -19,6 +19,7 @@
   --border-color: #1e293b;
   --search-bg: #1e293b;
   --card-bg: #1e293b;
+  color-scheme: dark;
 }
 
 * {
@@ -102,9 +103,10 @@ body.dark-theme .custom-select {
   color: #f8fafc !important; /* Slate-50 - Bright white/gray text */
 }
 
-body.dark-theme .report-select option {
-  background-color: #1e293b !important;
-  color: #f8fafc !important;
+body.dark-theme .report-select option,
+body.dark-theme select option {
+  background-color: #ffffff !important;
+  color: #111827 !important;
 }
 
 body.dark-theme .export-btn:hover,

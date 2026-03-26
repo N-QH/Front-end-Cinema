@@ -137,3 +137,30 @@
     </div>
   </div>
 </div>
+
+<!-- Auth Required Modal -->
+@if (showAuthModal) {
+  <div class="modal-overlay" (click)="showAuthModal = false">
+    <div class="auth-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="icon-circle">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+        <h3>Yêu cầu đăng nhập</h3>
+      </div>
+      
+      <p class="modal-description">Bạn cần đăng nhập để tiếp tục thanh toán và xác nhận giữ vé cho suất chiếu này.</p>
+      
+      <div class="modal-actions">
+        <button class="modal-btn cancel-btn" (click)="showAuthModal = false">Đóng</button>
+        <button class="modal-btn login-btn" (click)="goToLogin()">
+          <i class="fa-solid fa-right-to-bracket"></i> Đăng nhập
+        </button>
+      </div>
+      
+      <div class="register-prompt">
+        Chưa có tài khoản? <a (click)="goToRegister()">Đăng ký tại đây</a>
+      </div>
+    </div>
+  </div>
+}

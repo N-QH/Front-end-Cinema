@@ -1,9 +1,15 @@
-<div class="movie-item" [routerLink]="['/movie', movie?.id]" style="cursor: pointer;">
+<div class="movie-item" [class.grid-mode]="gridMode" [routerLink]="['/movie', movie?.id]" style="cursor: pointer;">
   <div class="movie-image-placeholder">
-    <!-- Abstract shapes inside placeholder snippet -->
-    <div class="mini-shape mini-shape-1"></div>
-    <div class="mini-shape mini-shape-2"></div>
-    <div class="mini-shape mini-shape-3"></div>
+    <!-- Only show shapes if there is no poster image -->
+    @if (!movie?.movieImage) {
+      <div class="mini-shape mini-shape-1"></div>
+      <div class="mini-shape mini-shape-2"></div>
+      <div class="mini-shape mini-shape-3"></div>
+    }
+    
+    @if (movie?.movieImage) {
+      <img [src]="movie.movieImage" class="movie-poster-img" alt="Movie Poster">
+    }
   </div>
   
   <div class="movie-info">

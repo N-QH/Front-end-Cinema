@@ -7,7 +7,11 @@ import { CommonModule } from '@angular/common';
   imports: [RouterLink, CommonModule],
   templateUrl: './movie-item.html',
   styleUrl: './movie-item.css',
+  host: {
+    'style': 'display: block; width: 100%;'
+  }
 })
 export class MovieItem {
   @Input() movie: any;
+  @Input() gridMode: boolean = false;
 }

@@ -53,7 +53,16 @@ export class AuthService {
   }
 
   register(user: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/register`, user, { responseType: 'text' });
+    return this.http.post(`${this.apiUrl}/register`, user, { responseType: 'text' })
+      .pipe(tap((token: string) => {
+        // If the backend returns a token, we handle it exactly like login
+        if (token && token.length > 50) { 
+           if (typeof window !== 'undefined') {
+               localStorage.setItem('token', token);
+           }
+           this.currentUserSubject.next(token);
+        }
+      }));
   }
 
   logout() {

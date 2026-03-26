@@ -41,13 +41,19 @@ export class Auth implements OnInit {
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
+      // Handle switch to register mode
+      if (params['mode'] === 'register') {
+        this.isLoginMode = false;
+      }
+
       const token = params['token'];
       if (token) {
         localStorage.setItem('token', token);
         // We might need to notify AuthService about the new token
         // But AuthService.getToken() already reads from localStorage
         // Triggering a navigation to clear the URL params
-        this.router.navigate(['/'], { replaceUrl: true }).then(() => {
+        const returnUrl = params['returnUrl'] || '/';
+        this.router.navigateByUrl(returnUrl, { replaceUrl: true }).then(() => {
           window.location.reload(); // Force reload to update state across app
         });
       }
@@ -72,7 +78,8 @@ export class Auth implements OnInit {
     if (this.isLoginMode) {
       this.authService.login(this.loginData).subscribe({
         next: () => {
-          this.router.navigate(['/']);
+          const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+          this.router.navigateByUrl(returnUrl);
           this.isLoading = false;
         },
         error: (err) => {
@@ -88,8 +95,25 @@ export class Auth implements OnInit {
       this.authService.register(this.registerData).subscribe({
         next: () => {
           this.toastService.showSuccess('Đăng ký thành công!');
-          this.router.navigate(['/']);
-          this.isLoading = false;
+          
+          // Explicitly call login after registration to ensure token is set and state is updated
+          this.authService.login({
+            email: this.registerData.email,
+            password: this.registerData.password
+          }).subscribe({
+            next: () => {
+              const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+              this.router.navigateByUrl(returnUrl).then(() => {
+                window.location.reload(); // Force reload to ensure Header and other components sync state
+              });
+              this.isLoading = false;
+            },
+            error: () => {
+              // Fallback if auto-login fails
+              this.router.navigate(['/auth']);
+              this.isLoading = false;
+            }
+          });
         },
         error: (err) => {
           const errMsg = err.error || 'Đăng ký thất bại, vui lòng thử lại.';

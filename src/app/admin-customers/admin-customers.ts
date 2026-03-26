@@ -1,13 +1,13 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { ToastService } from '../services/toast.service';
 
 @Component({
   selector: 'app-admin-customers',
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './admin-customers.html',
   styleUrl: '../admin/admin.css'
 })
@@ -22,6 +22,11 @@ export class AdminCustomers implements OnInit {
   selectedUserId: number | null = null;
   newPassword = '';
   isSavingPassword = false;
+  
+  showRoleModal = false;
+  selectedUser: any = null;
+  tempUserRoles = 'CUSTOMER';
+  isSavingRole = false;
   
   newUserData = {
     name: '',
@@ -163,6 +168,49 @@ export class AdminCustomers implements OnInit {
       error: (err) => {
         this.toastService.showError('Lỗi đổi mật khẩu: ' + (err.error || ''));
         this.isSavingPassword = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  openRoleModal(user: any) {
+    this.selectedUser = user;
+    this.tempUserRoles = user.roles && user.roles.length > 0 ? user.roles[0] : 'CUSTOMER';
+    this.showRoleModal = true;
+  }
+
+  closeRoleModal() {
+    this.showRoleModal = false;
+    this.selectedUser = null;
+    this.tempUserRoles = 'CUSTOMER';
+  }
+
+  submitRoleChange() {
+    if (!this.selectedUser) return;
+
+    this.isSavingRole = true;
+    
+    // Prepare full UserRequest since name/email are @NotBlank in backend
+    const updateRequest = {
+      name: this.selectedUser.name,
+      email: this.selectedUser.email,
+      roles: this.tempUserRoles,
+      age: this.selectedUser.age,
+      gender: this.selectedUser.gender,
+      address: this.selectedUser.address,
+      mobileNo: this.selectedUser.mobileNo
+    };
+
+    this.authService.updateProfile(this.selectedUser.id, updateRequest).subscribe({
+      next: () => {
+        this.toastService.showSuccess(`Đã cập nhật quyền cho ${this.selectedUser.email}`);
+        this.isSavingRole = false;
+        this.closeRoleModal();
+        this.loadUsers();
+      },
+      error: (err) => {
+        this.toastService.showError('Lỗi cập nhật quyền: ' + (err.error || ''));
+        this.isSavingRole = false;
         this.cdr.detectChanges();
       }
     });
