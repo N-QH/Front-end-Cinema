@@ -109,7 +109,10 @@ export class Booking implements OnInit {
     const tempDates = new Set<string>();
     relevantShows.forEach(s => tempDates.add(s.showDate));
     
-    this.availableDates = Array.from(tempDates).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+    const todayStr = new Date().toISOString().split('T')[0];
+    this.availableDates = Array.from(tempDates)
+      .filter(d => d >= todayStr)
+      .sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
     
     if (this.availableDates.length > 0) {
       this.selectDate(this.availableDates[0], relevantShows);
@@ -123,7 +126,17 @@ export class Booking implements OnInit {
 
   selectDate(d: string, relevantShows: any[] = this.shows) {
     this.selectedDate = d;
-    this.showsForSelectedDate = relevantShows.filter(s => s.showDate === d);
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
+    
+    this.showsForSelectedDate = relevantShows.filter(s => {
+      if (s.showDate !== d) return false;
+      if (d > todayStr) return true; // Future date is always OK
+      
+      // If it's today, check time
+      const showDateTime = new Date(`${s.showDate}T${s.showStartTime}`);
+      return showDateTime > now;
+    });
     this.selectedShowId = null; 
     this.seats = [];
     this.selectedSeats = [];

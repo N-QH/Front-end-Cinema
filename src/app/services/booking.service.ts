@@ -86,5 +86,26 @@ export class BookingService {
   searchMovies(name: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/movie/search`, { params: { name } });
   }
+
+  // Coupons
+  createCoupon(couponRequest: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/coupon/addNew`, couponRequest);
+  }
+
+  getAllCoupons(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/coupon/all`);
+  }
+
+  toggleCoupon(couponId: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/coupon/${couponId}/toggle`, {}, { responseType: 'text' });
+  }
+
+  deleteCoupon(couponId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/coupon/${couponId}`, { responseType: 'text' });
+  }
+
+  validateCoupon(code: string): Observable<number> {
+    return this.http.get<number>(`${this.apiUrl}/coupon/validate?code=${code}`);
+  }
 }
 

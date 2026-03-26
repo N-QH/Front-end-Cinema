@@ -1,0 +1,152 @@
+<div class="admin-layout">
+  
+  <aside class="admin-sidebar">
+    <div class="admin-brand">
+      <i class="fa-solid fa-film"></i>
+      <span>Cinema Admin</span>
+    </div>
+    
+    <nav class="admin-nav">
+      <a href="#" class="nav-item" routerLink="/admin">
+        <i class="fa-solid fa-video"></i> Quản lý Phim
+      </a>
+      <a href="#" class="nav-item" routerLink="/admin/theaters">
+        <i class="fa-solid fa-building"></i> Quản lý Rạp
+      </a>
+      <a href="#" class="nav-item" routerLink="/admin/shows">
+        <i class="fa-solid fa-calendar-alt"></i> Lịch chiếu
+      </a>
+      <a href="#" class="nav-item" routerLink="/admin/customers">
+        <i class="fa-solid fa-users"></i> Khách hàng
+      </a>
+      <a href="#" class="nav-item active" routerLink="/admin/coupons">
+        <i class="fa-solid fa-ticket"></i> Mã giảm giá
+      </a>
+      <a href="#" class="nav-item" routerLink="/admin/reports">
+        <i class="fa-solid fa-file-invoice-dollar"></i> Báo cáo doanh thu
+      </a>
+    </nav>
+    
+    <div class="sidebar-footer">
+      <a href="#" class="nav-item" routerLink="/">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i> Về trang chủ
+      </a>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <header class="admin-header">
+      <div class="header-search">
+        <i class="fa-solid fa-search"></i>
+        <input type="text" placeholder="Tìm kiếm mã..." />
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn"><i class="fa-regular fa-bell"></i></button>
+        <div class="admin-user">
+          <img src="https://ui-avatars.com/api/?name=Admin&background=7c3aed&color=fff" alt="Admin" class="avatar" />
+          <span>Admin</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="admin-content">
+      <div class="page-header">
+        <h2>Quản lý Mã Giảm Giá</h2>
+        <button class="primary-btn" (click)="openAddModal()"><i class="fa-solid fa-plus"></i> Tạo mã mới</button>
+      </div>
+
+      <div class="content-table-wrapper">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Mã</th>
+              <th>% Giảm</th>
+              <th>Đã dùng / Tối đa</th>
+              <th>Ngày hết hạn</th>
+              <th>Trạng thái</th>
+              <th>Hành động</th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (isLoading) {
+              <tr>
+                <td colspan="7" style="text-align: center; padding: 20px;">Đang tải dữ liệu...</td>
+              </tr>
+            } @else if (coupons.length === 0) {
+              <tr>
+                <td colspan="7" style="text-align: center; padding: 20px;">Chưa có mã giảm giá nào.</td>
+              </tr>
+            } @else {
+              @for (coupon of coupons; track coupon.id) {
+                <tr>
+                  <td>#{{ coupon.id }}</td>
+                  <td><strong>{{ coupon.code }}</strong></td>
+                  <td>{{ coupon.discountPercent }}%</td>
+                  <td>{{ coupon.usedCount }} / {{ coupon.maxUses ? coupon.maxUses : '∞' }}</td>
+                  <td>{{ formatDate(coupon.expiresAt) }}</td>
+                  <td>
+                    @if (coupon.isActive) {
+                      <span class="status-badge valid" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">Đang chạy</span>
+                    } @else {
+                      <span class="status-badge" style="background: rgba(239, 68, 68, 0.2); color: #ef4444;">Đã dừng</span>
+                    }
+                  </td>
+                  <td>
+                    <button class="action-btn edit" [title]="coupon.isActive ? 'Tạm dừng' : 'Kích hoạt lại'" (click)="toggleActive(coupon)">
+                      <i class="fa-solid fa-power-off" [style.color]="coupon.isActive ? '#10b981' : '#cbd5e1'"></i>
+                    </button>
+                    <button class="action-btn delete" title="Xóa" (click)="deleteCoupon(coupon.id)">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+@if (showAddModal) {
+<div class="modal-overlay" (click)="closeAddModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()" style="width: 500px;">
+    <div class="modal-header">
+      <h3>Tạo Mã Giảm Giá Mới</h3>
+      <button class="modal-close-btn" (click)="closeAddModal()">&times;</button>
+    </div>
+
+    <form (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label>Mã code (Ví dụ: TET2026, SUMMER25)</label>
+        <input type="text" class="form-input" [(ngModel)]="newCouponData.code" name="code" required style="text-transform: uppercase;">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Phần trăm giảm (%)</label>
+          <input type="number" class="form-input" [(ngModel)]="newCouponData.discountPercent" name="discount" required min="1" max="100">
+        </div>
+        <div class="form-group">
+          <label>Số lần dùng tối đa</label>
+          <input type="number" class="form-input" [(ngModel)]="newCouponData.maxUses" name="maxUses" min="1" placeholder="Để trống nếu Vô hạn">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Ngày hết hạn (Tuỳ chọn)</label>
+        <input type="date" class="form-input" [(ngModel)]="newCouponData.expiresAt" name="expiresAt">
+      </div>
+
+      <div class="form-actions" style="margin-top: 24px;">
+        <button type="button" class="btn-cancel" (click)="closeAddModal()">Hủy</button>
+        <button type="submit" [disabled]="isSaving" class="primary-btn" style="border: none;">
+          {{ isSaving ? 'Đang tạo...' : 'Tạo mã' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+}

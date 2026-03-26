@@ -211,11 +211,37 @@ body.dark-theme .dropdown-toggle:hover {
   to { transform: scale(1); opacity: 1; }
 }
 
+.movie-groups-container {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  margin-top: 40px;
+}
+
+.genre-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.genre-section-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-main);
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--primary-color);
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
 .movie-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 24px;
-  margin-bottom: 40px;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 32px;
 }
 
 .loading-state, .empty-state {
@@ -226,20 +252,10 @@ body.dark-theme .dropdown-toggle:hover {
   grid-column: 1 / -1;
 }
 
-@media (max-width: 1024px) {
-  .movie-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .movie-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
+/* Fluid grid handles most sizes, keeping minimal overrides if absolutely necessary */
 @media (max-width: 480px) {
   .movie-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
   }
 }

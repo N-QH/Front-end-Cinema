@@ -16,7 +16,7 @@ export class MovieList implements OnInit {
   isLoading = true;
   
   currentPage = 1;
-  pageSize = 5;
+  pageSize = 8;
   totalPages = 0;
 
   constructor(private movieService: MovieService, private cdr: ChangeDetectorRef) {}

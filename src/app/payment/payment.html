@@ -90,11 +90,11 @@
           </div>
           <div class="info-item">
             <span class="info-label">Suất chiếu</span>
-            <span class="info-value">{{ bookingInfo.show?.time }}, {{ bookingInfo.show?.date | date:'dd/MM/yyyy' }}</span>
+            <span class="info-value">{{ bookingInfo.show?.showTime | slice:0:5 }}, {{ bookingInfo.show?.showDate | date:'dd/MM/yyyy' }}</span>
           </div>
           <div class="info-item">
             <span class="info-label">Phòng chiếu</span>
-            <span class="info-value">CINEMA 5</span>
+            <span class="info-value">Phòng {{ bookingInfo.show?.screenNumber || '?' }}</span>
           </div>
           <div class="info-item">
             <span class="info-label">Ghế</span>
@@ -116,14 +116,21 @@
         <div class="promocode-group">
           <div class="input-wrapper">
             <i class="fa-solid fa-ticket"></i>
-            <input type="text" placeholder="Nhập mã giảm giá" />
+            <input type="text" [(ngModel)]="couponCode" name="coupon" placeholder="Nhập mã giảm giá" [disabled]="couponApplied" />
           </div>
-          <button class="apply-btn">Áp dụng</button>
+          <button class="apply-btn" (click)="applyCoupon()" [disabled]="!couponCode || isApplyingCoupon || couponApplied">
+            {{ isApplyingCoupon ? 'Đang kiểm tra...' : (couponApplied ? 'Đã áp dụng' : 'Áp dụng') }}
+          </button>
+        </div>
+        
+        <div class="price-row" *ngIf="discountAmount > 0" style="color: #10b981;">
+          <span>Giảm giá ({{ discountPercent }}%)</span>
+          <span>-{{ formatPrice(discountAmount) }}</span>
         </div>
         
         <div class="price-total">
           <span>Tổng cộng</span>
-          <span class="total-amount">{{ formatPrice(bookingInfo.totalPrice + 10000) }}</span>
+          <span class="total-amount">{{ formatPrice(bookingInfo.totalPrice + 10000 - discountAmount) }}</span>
         </div>
       </div>
 

@@ -191,6 +191,16 @@ export class Admin implements OnInit {
   }
 
   onSubmit() {
+    // Release Date Validation
+    const now = new Date();
+    now.setHours(0, 0, 0, 0); // Only compare date part
+    const releaseDate = new Date(this.movieData.releaseDate);
+    
+    if (releaseDate < now) {
+      this.toastService.showError('Ngày phát hành không thể là ngày trong quá khứ!');
+      return;
+    }
+
     this.isLoading = true;
     this.message = null;
     this.error = null;

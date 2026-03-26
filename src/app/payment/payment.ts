@@ -1,12 +1,13 @@
 import { Component, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { BookingService } from '../services/booking.service';
 import { ToastService } from '../services/toast.service';
 
 @Component({
   selector: 'app-payment',
-  imports: [RouterLink, CommonModule],
+  imports: [RouterLink, CommonModule, FormsModule],
   templateUrl: './payment.html',
   styleUrl: './payment.css',
 })
@@ -18,6 +19,12 @@ export class Payment implements OnInit, OnDestroy {
   intervalId: any;
   holdExpired: boolean = false;
   bookingSuccess: boolean = false;
+  
+  couponCode: string = '';
+  discountPercent: number = 0;
+  discountAmount: number = 0;
+  couponApplied: boolean = false;
+  isApplyingCoupon: boolean = false;
 
   constructor(
     private router: Router,
@@ -122,15 +129,37 @@ export class Payment implements OnInit, OnDestroy {
     return this.bookingInfo?.seats?.join(', ') || 'N/A';
   }
 
+  applyCoupon() {
+    if (!this.couponCode || this.couponApplied) return;
+    this.isApplyingCoupon = true;
+    
+    this.bookingService.validateCoupon(this.couponCode).subscribe({
+      next: (discount) => {
+        this.discountPercent = discount;
+        this.discountAmount = this.bookingInfo.totalPrice * (discount / 100);
+        this.couponApplied = true;
+        this.isApplyingCoupon = false;
+        this.toastService.showSuccess(`Áp dụng mã giảm giá thành công! Giảm ${discount}%`);
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.isApplyingCoupon = false;
+        this.toastService.showError('Mã không hợp lệ: ' + (err.error || 'Vui lòng kiểm tra lại'));
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
   confirmPayment() {
     if (!this.bookingInfo || this.isProcessing) return;
     this.isProcessing = true;
-    this.cdr.detectChanges(); // Fix NG0100
+    this.cdr.detectChanges();
 
     const payload = {
       showId: this.bookingInfo.showId,
       userId: this.bookingInfo.userId,
-      requestSeats: this.bookingInfo.seats
+      requestSeats: this.bookingInfo.seats,
+      couponCode: this.couponApplied ? this.couponCode : null
     };
 
     this.bookingService.bookTicket(payload).subscribe({

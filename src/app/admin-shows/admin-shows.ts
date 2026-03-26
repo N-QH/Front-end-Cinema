@@ -172,6 +172,15 @@ export class AdminShows implements OnInit {
   }
 
   onSubmit() {
+    // Date/Time Validation
+    const now = new Date();
+    const showDateTime = new Date(`${this.showData.showDate}T${this.showData.showStartTime}`);
+    
+    if (showDateTime < now) {
+      this.toastService.showError('Không thể thêm lịch chiếu trong quá khứ!');
+      return;
+    }
+
     this.isLoading = true;
 
     // Ensure time format is HH:mm:ss for java.sql.Time

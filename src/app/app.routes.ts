@@ -14,6 +14,7 @@ import { Category } from './category/category';
 import { AdminCustomers } from './admin-customers/admin-customers';
 import { ForgotPassword } from './forgot-password/forgot-password';
 import { Settings } from './settings/settings';
+import { AdminCoupons } from './admin-coupons/admin-coupons';
 
 export const routes: Routes = [
   { path: '', component: Home },
@@ -30,5 +31,6 @@ export const routes: Routes = [
   { path: 'admin/theaters', component: AdminTheaters },
   { path: 'admin/shows', component: AdminShows },
   { path: 'admin/reports', component: Reports },
-  { path: 'admin/customers', component: AdminCustomers }
+  { path: 'admin/customers', component: AdminCustomers },
+  { path: 'admin/coupons', component: AdminCoupons }
 ];

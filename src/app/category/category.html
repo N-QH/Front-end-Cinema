@@ -43,14 +43,24 @@
   </div>
 
   <!-- Movie List Grid -->
-  <div class="movie-grid">
+  <div class="movie-groups-container">
     @if (isLoading) {
       <div class="loading-state">Đang tải danh sách phim...</div>
-    } @else if (filteredMovies.length === 0) {
+    } @else if (groupedMovies.length === 0) {
       <div class="empty-state">Không có phim nào phù hợp với thể loại đã chọn.</div>
     } @else {
-      @for (movie of filteredMovies; track movie.id) {
-        <app-movie-item [movie]="movie" [gridMode]="true"></app-movie-item>
+      @for (group of groupedMovies; track group.genre) {
+        <div class="genre-section">
+          <h3 class="genre-section-title">
+            <i class="fa-solid fa-tags me-2"></i>
+            {{ genreTranslations[group.genre] || group.genre }}
+          </h3>
+          <div class="movie-grid">
+            @for (movie of group.movies; track movie.id) {
+              <app-movie-item [movie]="movie" [gridMode]="true"></app-movie-item>
+            }
+          </div>
+        </div>
       }
     }
   </div>

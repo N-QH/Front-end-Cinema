@@ -104,15 +104,32 @@ export class Category implements OnInit {
     this.applyFilters();
   }
 
-  applyFilters() {
-    this.filteredMovies = this.movies.filter(movie => {
-      // Filter by tab
-      const matchTab = this.activeTab === 'NOW_SHOWING' ? !movie.isUpcoming : movie.isUpcoming;
-      
-      // Filter by genre
-      const matchGenre = this.selectedGenres.length === 0 || this.selectedGenres.includes(movie.genre);
+  groupedMovies: { genre: string, movies: any[] }[] = [];
 
-      return matchTab && matchGenre;
+  applyFilters() {
+    // Stage 1: Filter by tab (Now Showing / Coming Soon)
+    const tabFiltered = this.movies.filter(movie => {
+      const matchTab = this.activeTab === 'NOW_SHOWING' ? !movie.isUpcoming : movie.isUpcoming;
+      return matchTab;
+    });
+
+    // Stage 2: Group by genres
+    // If genres are selected, only show those genre blocks.
+    // If no genre is selected, show all sections that have movies.
+    const genresToProcess = this.selectedGenres.length > 0 ? this.selectedGenres : this.availableGenres;
+
+    this.groupedMovies = genresToProcess.map(genre => {
+      const moviesInGenre = tabFiltered.filter(movie => {
+        const movieGenres = movie.genre ? movie.genre.split(',').map((g: string) => g.trim()) : [];
+        return movieGenres.includes(genre);
+      });
+      return { genre, movies: moviesInGenre };
+    }).filter(group => group.movies.length > 0);
+
+    // Fallback for flat filtered list if needed by legacy parts (optional)
+    this.filteredMovies = tabFiltered.filter(movie => {
+        const movieGenres = movie.genre ? movie.genre.split(',').map((g: string) => g.trim()) : [];
+        return this.selectedGenres.length === 0 || this.selectedGenres.some(g => movieGenres.includes(g));
     });
   }
 }
