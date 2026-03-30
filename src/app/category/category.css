@@ -214,48 +214,104 @@ body.dark-theme .dropdown-toggle:hover {
 .movie-groups-container {
   display: flex;
   flex-direction: column;
-  gap: 48px;
-  margin-top: 40px;
+  gap: 40px;
+  margin-top: 32px;
+  padding: 0 20px;
 }
 
 .genre-section {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
+  position: relative;
+}
+
+.genre-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-right: 10px;
 }
 
 .genre-section-title {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--text-main);
-  padding-bottom: 12px;
-  border-bottom: 2px solid var(--primary-color);
-  width: fit-content;
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
+  margin: 0;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
 }
 
-.movie-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 32px;
+.section-actions {
+  display: flex;
+  gap: 12px;
 }
 
-.loading-state, .empty-state {
-  text-align: center;
-  padding: 40px;
-  color: var(--text-secondary);
-  font-size: 1.1rem;
-  grid-column: 1 / -1;
+.scroll-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-/* Fluid grid handles most sizes, keeping minimal overrides if absolutely necessary */
-@media (max-width: 480px) {
-  .movie-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+.scroll-btn:hover {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+  transform: scale(1.1);
+}
+
+body.dark-theme .scroll-btn {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.movie-scroll-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.movie-scroll-row {
+  display: flex;
+  gap: 24px;
+  overflow-x: auto;
+  padding: 10px 4px 20px 4px;
+  scroll-behavior: smooth;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.movie-scroll-row::-webkit-scrollbar {
+  display: none; /* Chrome/Safari/Opera */
+}
+
+.movie-card-wrapper {
+  flex: 0 0 200px; /* Fixed width matching the home page scaling */
+  transition: transform 0.3s ease;
+}
+
+.movie-card-wrapper:hover {
+  z-index: 2;
+}
+
+@media (max-width: 768px) {
+  .movie-card-wrapper {
+    flex: 0 0 160px;
+  }
+  .movie-scroll-row {
     gap: 16px;
+  }
+  .section-actions {
+    display: none; /* Hide arrows on mobile, use touch scroll */
   }
 }

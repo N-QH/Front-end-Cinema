@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MovieService } from '../services/movie.service';
+import { AuthService } from '../services/auth.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
@@ -15,6 +16,7 @@ export class MovieDetails implements OnInit {
   isLoading = true;
   showTrailer = false;
   safeTrailerUrl: SafeResourceUrl | null = null;
+  userAge: number | null = null;
 
   openTrailer() {
     this.showTrailer = true;
@@ -27,11 +29,23 @@ export class MovieDetails implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private movieService: MovieService,
+    private authService: AuthService,
     private cdr: ChangeDetectorRef,
     private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit() {
+    const email = this.authService.getUserEmail();
+    if (email) {
+      this.authService.getUserByEmail(email).subscribe({
+        next: (user) => {
+          if (user && user.age !== undefined && user.age !== null) {
+            this.userAge = user.age;
+          }
+        }
+      });
+    }
+
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.movieService.getMovieById(+id).subscribe({
@@ -58,5 +72,16 @@ export class MovieDetails implements OnInit {
       this.isLoading = false;
     }
   }
+
+  get isAgeRestricted(): boolean {
+    if (this.userAge === null) return false;
+    if (!this.movie || !this.movie.ageRequirement || this.movie.ageRequirement === 'P') return false;
+    
+    const requiredAge = parseInt(this.movie.ageRequirement);
+    if (isNaN(requiredAge)) return false;
+    
+    return this.userAge < requiredAge;
+  }
 }
+
 

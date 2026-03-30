@@ -147,8 +147,24 @@
   border-color: var(--primary-color);
 }
 
+.time-btn:disabled, body.dark-theme .time-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+  background-color: #f3f4f6;
+  border-color: #e5e7eb;
+  color: #9ca3af;
+}
+
+body.dark-theme .time-btn:disabled {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #64748b;
+}
+
 body.dark-theme .date-btn:not(.active),
-body.dark-theme .time-btn:not(.active) {
+body.dark-theme .time-btn:not(.active):not(:disabled) {
+
   background-color: #1e293b;
   border-color: #334155;
   color: #f8fafc;

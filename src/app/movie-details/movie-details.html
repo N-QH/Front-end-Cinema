@@ -67,10 +67,17 @@
         </div>
 
         <div class="action-buttons">
-          <button class="book-now-btn" [routerLink]="['/booking', movie.id]">
-            <i class="fa-solid fa-ticket"></i>
-            Mua vé ngay
-          </button>
+          @if (isAgeRestricted) {
+            <button class="book-now-btn restricted-btn" disabled>
+              <i class="fa-solid fa-ban"></i>
+              Không đủ tuổi yêu cầu ({{ movie.ageRequirement }}+)
+            </button>
+          } @else {
+            <button class="book-now-btn" [routerLink]="['/booking', movie.id]">
+              <i class="fa-solid fa-ticket"></i>
+              Mua vé ngay
+            </button>
+          }
           <button class="favorite-btn-large">
             <i class="fa-regular fa-heart"></i>
           </button>

@@ -51,19 +51,32 @@
     } @else {
       @for (group of groupedMovies; track group.genre) {
         <div class="genre-section">
-          <h3 class="genre-section-title">
-            <i class="fa-solid fa-tags me-2"></i>
-            {{ genreTranslations[group.genre] || group.genre }}
-          </h3>
-          <div class="movie-grid">
-            @for (movie of group.movies; track movie.id) {
-              <app-movie-item [movie]="movie" [gridMode]="true"></app-movie-item>
-            }
+          <div class="genre-header">
+            <h3 class="genre-section-title">
+              <i class="fa-solid fa-tags me-2"></i>
+              {{ genreTranslations[group.genre] || group.genre }}
+            </h3>
+            <div class="section-actions" *ngIf="group.movies.length > 0">
+              <button class="scroll-btn prev" (click)="scrollRow(movieScrollRow, 'left')">
+                <i class="fa-solid fa-chevron-left"></i>
+              </button>
+              <button class="scroll-btn next" (click)="scrollRow(movieScrollRow, 'right')">
+                <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="movie-scroll-wrapper">
+            <div class="movie-scroll-row" #movieScrollRow>
+              @for (movie of group.movies; track movie.id) {
+                <div class="movie-card-wrapper">
+                  <app-movie-item [movie]="movie" [gridMode]="true"></app-movie-item>
+                </div>
+              }
+            </div>
           </div>
         </div>
       }
     }
   </div>
-  
-  <app-pagination></app-pagination>
 </div>

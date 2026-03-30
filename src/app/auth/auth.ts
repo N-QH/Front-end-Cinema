@@ -25,7 +25,7 @@ export class Auth implements OnInit {
     email: '', 
     password: '', 
     mobileNo: '', 
-    age: 18, 
+    dateOfBirth: '', 
     gender: 'MALE', 
     address: '', 
     roles: 'CUSTOMER' 

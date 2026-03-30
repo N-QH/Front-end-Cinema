@@ -67,7 +67,7 @@ export class Profile implements OnInit {
       name: this.userProfile.name,
       email: this.userProfile.email,
       mobileNo: this.userProfile.mobileNo,
-      age: this.userProfile.age,
+      dateOfBirth: this.userProfile.dateOfBirth,
       gender: this.userProfile.gender,
       address: this.userProfile.address,
       roles: Array.isArray(this.userProfile.roles) ? this.userProfile.roles.join(',') : (this.userProfile.roles || 'CUSTOMER'),

@@ -32,7 +32,7 @@ export class AdminCustomers implements OnInit {
     name: '',
     email: '',
     password: '',
-    age: null,
+    dateOfBirth: '',
     gender: 'MALE',
     address: '',
     mobileNo: '',
@@ -112,7 +112,7 @@ export class AdminCustomers implements OnInit {
 
   openAddModal() {
     this.newUserData = {
-      name: '', email: '', password: '', age: null, gender: 'MALE', address: '', mobileNo: '', roles: 'CUSTOMER'
+      name: '', email: '', password: '', dateOfBirth: '', gender: 'MALE', address: '', mobileNo: '', roles: 'CUSTOMER'
     };
     this.showAddModal = true;
   }
@@ -195,7 +195,7 @@ export class AdminCustomers implements OnInit {
       name: this.selectedUser.name,
       email: this.selectedUser.email,
       roles: this.tempUserRoles,
-      age: this.selectedUser.age,
+      dateOfBirth: this.selectedUser.dateOfBirth,
       gender: this.selectedUser.gender,
       address: this.selectedUser.address,
       mobileNo: this.selectedUser.mobileNo

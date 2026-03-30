@@ -48,6 +48,7 @@
               <button 
                 class="time-btn" 
                 [class.active]="selectedShowId === (show.showId || show.id)"
+                [disabled]="isPastShow(show)"
                 (click)="selectShow(show)"
               >
                 {{ show.showTime | slice:0:5 }} <br/>

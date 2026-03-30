@@ -226,6 +226,21 @@
   transform: translateY(-2px);
 }
 
+.book-now-btn.restricted-btn:disabled {
+  background-color: #94a3b8;
+  color: #f1f5f9;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  border: 1px solid #cbd5e1;
+}
+
+body.dark-theme .book-now-btn.restricted-btn:disabled {
+  background-color: #334155;
+  color: #94a3b8;
+  border-color: #475569;
+}
+
 .favorite-btn-large {
   width: 56px;
   height: 56px;

@@ -138,7 +138,7 @@
 .social-btn {
   width: 100%;
   padding: 14px;
-  background-color: #fff;
+  background-color: var(--card-bg);
   border: 1px solid var(--border-color);
   color: var(--text-main);
   border-radius: 12px;
@@ -148,15 +148,28 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .social-btn:hover {
   background-color: var(--search-bg);
+  border-color: var(--primary-color);
 }
 
 .social-btn i {
   font-size: 18px;
+}
+
+body.dark-theme .social-btn {
+  background-color: #1e293b;
+  color: #f8fafc;
+  border-color: #334155;
+}
+
+body.dark-theme .social-btn:hover {
+  background-color: #334155;
+  border-color: var(--primary-color);
 }
 
 .auth-footer {

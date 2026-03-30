@@ -6,7 +6,7 @@ import { MovieService } from '../services/movie.service';
 
 @Component({
   selector: 'app-category',
-  imports: [MovieItem, Pagination, CommonModule],
+  imports: [MovieItem, CommonModule],
   templateUrl: './category.html',
   styleUrl: './category.css',
 })
@@ -130,6 +130,14 @@ export class Category implements OnInit {
     this.filteredMovies = tabFiltered.filter(movie => {
         const movieGenres = movie.genre ? movie.genre.split(',').map((g: string) => g.trim()) : [];
         return this.selectedGenres.length === 0 || this.selectedGenres.some(g => movieGenres.includes(g));
+    });
+  }
+
+  scrollRow(container: HTMLElement, direction: 'left' | 'right') {
+    const scrollAmount = container.clientWidth * 0.8;
+    container.scrollBy({
+      left: direction === 'left' ? -scrollAmount : scrollAmount,
+      behavior: 'smooth'
     });
   }
 }
