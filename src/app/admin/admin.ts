@@ -7,10 +7,11 @@ import { ToastService } from '../services/toast.service';
 import { AdminService } from '../services/admin.service';
 import { AuthService } from '../services/auth.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { AdminHeaderComponent } from '../admin-header/admin-header';
 
 @Component({
   selector: 'app-admin',
-  imports: [RouterLink, CommonModule, FormsModule],
+  imports: [RouterLink, CommonModule, FormsModule, AdminHeaderComponent],
   templateUrl: './admin.html',
   styleUrl: './admin.css',
 })
@@ -25,10 +26,6 @@ export class Admin implements OnInit {
   message: string | null = null;
   error: string | null = null;
   
-  // Admin profile
-  adminName: string = 'Admin';
-  adminImage: string = '';
-
   movies: any[] = [];
   stats: any = {
     ticketsToday: 0,
@@ -76,15 +73,6 @@ export class Admin implements OnInit {
   ngOnInit() {
     this.loadMovies();
     this.loadStats();
-    
-    // Load admin profile
-    this.authService.userProfile$.subscribe(user => {
-      if (user) {
-        this.adminName = user.name || 'Admin';
-        this.adminImage = user.userImage || '';
-        this.cdr.detectChanges();
-      }
-    });
   }
 
   loadStats() {

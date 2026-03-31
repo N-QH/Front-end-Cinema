@@ -1,0 +1,43 @@
+<header class="admin-header">
+  <div class="header-search">
+    <i class="fa-solid fa-search"></i>
+    <input type="text" placeholder="Tìm kiếm..." />
+  </div>
+  <div class="header-actions">
+    <div class="notification-container">
+      <button class="icon-btn" (click)="toggleNotifications()">
+        <i class="fa-regular fa-bell"></i>
+        <span class="badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+      </button>
+
+      <div class="notification-dropdown" *ngIf="showNotifications">
+        <div class="dropdown-header">
+          <h4>Thông báo</h4>
+          <span class="badge-count">{{ unreadCount }} mới</span>
+        </div>
+        <div class="dropdown-body">
+          <div class="empty-notif" *ngIf="notifications.length === 0">
+            Không có thông báo nào.
+          </div>
+          <div class="notif-item" *ngFor="let n of notifications" [class.unread]="!n.read" (click)="markAsRead(n)">
+            <div class="notif-icon" [style.background-color]="n.color + '20'" [style.color]="n.color">
+              <i [class]="n.icon"></i>
+            </div>
+            <div class="notif-content">
+              <p class="notif-msg">{{ n.message }}</p>
+              <span class="notif-time">{{ n.timestamp | date:'short' }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="dropdown-footer">
+          <a href="javascript:void(0)" (click)="readAll()">Đọc tất cả</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-user">
+      <img [src]="adminImage || 'https://ui-avatars.com/api/?name=' + adminName + '&background=7c3aed&color=fff'" [alt]="adminName" class="avatar" style="object-fit: cover;" />
+      <span>{{ adminName }}</span>
+    </div>
+  </div>
+</header>

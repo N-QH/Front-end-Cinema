@@ -5,10 +5,11 @@ import { FormsModule } from '@angular/forms';
 import { BookingService } from '../services/booking.service';
 import { ToastService } from '../services/toast.service';
 import { AuthService } from '../services/auth.service';
+import { AdminHeaderComponent } from '../admin-header/admin-header';
 
 @Component({
   selector: 'app-admin-theaters',
-  imports: [RouterLink, CommonModule, FormsModule],
+  imports: [RouterLink, CommonModule, FormsModule, AdminHeaderComponent],
   templateUrl: './admin-theaters.html',
   styleUrl: '../admin/admin.css',
 })
@@ -16,8 +17,6 @@ export class AdminTheaters implements OnInit {
   showAddModal = false;
   isLoading = false;
   isFetching = true;
-  adminName = 'Admin';
-  adminImage = '';
   
   theaters: any[] = [];
   
@@ -44,9 +43,6 @@ export class AdminTheaters implements OnInit {
 
   ngOnInit() {
     this.loadTheaters();
-    this.authService.userProfile$.subscribe(u => {
-      if (u) { this.adminName = u.name || 'Admin'; this.adminImage = u.userImage || ''; this.cdr.detectChanges(); }
-    });
   }
 
   loadTheaters() {

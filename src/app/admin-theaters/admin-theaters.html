@@ -35,19 +35,7 @@
   </aside>
 
   <main class="admin-main">
-    <header class="admin-header">
-      <div class="header-search">
-        <i class="fa-solid fa-search"></i>
-        <input type="text" placeholder="Tìm kiếm rạp..." />
-      </div>
-      <div class="header-actions">
-        <button class="icon-btn"><i class="fa-regular fa-bell"></i></button>
-        <div class="admin-user">
-          <img [src]="adminImage || 'https://ui-avatars.com/api/?name=' + adminName + '&background=7c3aed&color=fff'" [alt]="adminName" class="avatar" style="object-fit: cover;" />
-          <span>{{ adminName }}</span>
-        </div>
-      </div>
-    </header>
+    <app-admin-header></app-admin-header>
 
     <div class="admin-content">
       <div class="page-header">

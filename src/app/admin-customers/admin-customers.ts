@@ -4,18 +4,17 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { ToastService } from '../services/toast.service';
+import { AdminHeaderComponent } from '../admin-header/admin-header';
 
 @Component({
   selector: 'app-admin-customers',
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, AdminHeaderComponent],
   templateUrl: './admin-customers.html',
   styleUrl: '../admin/admin.css'
 })
 export class AdminCustomers implements OnInit {
   users: any[] = [];
   isLoading = true;
-  adminName = 'Admin';
-  adminImage = '';
   
   showAddModal = false;
   isSaving = false;
@@ -49,9 +48,6 @@ export class AdminCustomers implements OnInit {
 
   ngOnInit() {
     this.loadUsers();
-    this.authService.userProfile$.subscribe(u => {
-      if (u) { this.adminName = u.name || 'Admin'; this.adminImage = u.userImage || ''; this.cdr.detectChanges(); }
-    });
   }
 
   loadUsers() {

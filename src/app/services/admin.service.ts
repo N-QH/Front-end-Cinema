@@ -26,4 +26,16 @@ export class AdminService {
   getRevenueByTheater(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/revenue-by-theater`);
   }
+
+  getNotifications(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/notifications`);
+  }
+
+  markNotificationAsRead(id: string): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/mark-read/${id}`, {});
+  }
+
+  markAllNotificationsAsRead(): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/mark-all-read`, {});
+  }
 }

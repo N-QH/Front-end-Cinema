@@ -4,12 +4,13 @@ import { CommonModule } from '@angular/common';
 import { AdminService } from '../services/admin.service';
 import { AuthService } from '../services/auth.service';
 import { Chart, registerables } from 'chart.js';
+import { AdminHeaderComponent } from '../admin-header/admin-header';
 
 Chart.register(...registerables);
 
 @Component({
   selector: 'app-reports',
-  imports: [RouterLink, CommonModule],
+  imports: [RouterLink, CommonModule, AdminHeaderComponent],
   templateUrl: './reports.html',
   styleUrl: './reports.css',
 })
@@ -23,17 +24,12 @@ export class Reports implements OnInit, AfterViewInit {
   
   private revenueChart: any;
   private theaterChart: any;
-  adminName = 'Admin';
-  adminImage = '';
 
   constructor(private adminService: AdminService, private authService: AuthService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.loadTopMovies();
     this.loadRevenueByDay();
-    this.authService.userProfile$.subscribe(u => {
-      if (u) { this.adminName = u.name || 'Admin'; this.adminImage = u.userImage || ''; this.cdr.detectChanges(); }
-    });
     this.loadRevenueByTheater();
   }
 

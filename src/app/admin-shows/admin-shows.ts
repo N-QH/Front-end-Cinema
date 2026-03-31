@@ -6,10 +6,11 @@ import { BookingService } from '../services/booking.service';
 import { MovieService } from '../services/movie.service';
 import { ToastService } from '../services/toast.service';
 import { AuthService } from '../services/auth.service';
+import { AdminHeaderComponent } from '../admin-header/admin-header';
 
 @Component({
   selector: 'app-admin-shows',
-  imports: [RouterLink, CommonModule, FormsModule],
+  imports: [RouterLink, CommonModule, FormsModule, AdminHeaderComponent],
   templateUrl: './admin-shows.html',
   styleUrl: '../admin/admin.css',
 })
@@ -19,8 +20,6 @@ export class AdminShows implements OnInit {
   isLoading = false;
   isFetching = true;
   savingSeats = false;
-  adminName = 'Admin';
-  adminImage = '';
   
   shows: any[] = [];
   movies: any[] = [];
@@ -54,9 +53,6 @@ export class AdminShows implements OnInit {
   ngOnInit() {
     this.loadShows();
     this.loadLookups();
-    this.authService.userProfile$.subscribe(u => {
-      if (u) { this.adminName = u.name || 'Admin'; this.adminImage = u.userImage || ''; this.cdr.detectChanges(); }
-    });
   }
 
   loadShows() {

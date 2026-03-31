@@ -6,10 +6,11 @@ import { BookingService } from '../services/booking.service';
 import { MovieService } from '../services/movie.service';
 import { ToastService } from '../services/toast.service';
 import { AuthService } from '../services/auth.service';
+import { AdminHeaderComponent } from '../admin-header/admin-header';
 
 @Component({
   selector: 'app-admin-coupons',
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, AdminHeaderComponent],
   templateUrl: './admin-coupons.html',
   styleUrl: '../admin/admin.css'
 })
@@ -21,8 +22,6 @@ export class AdminCoupons implements OnInit {
   isSaving = false;
   isEditMode = false;
   editingCouponId: number | null = null;
-  adminName = 'Admin';
-  adminImage = '';
 
   newCouponData = {
     code: '',
@@ -45,9 +44,6 @@ export class AdminCoupons implements OnInit {
     this.movieService.getMovies().subscribe({
       next: (movies) => { this.allMovies = movies; },
       error: () => {}
-    });
-    this.authService.userProfile$.subscribe(u => {
-      if (u) { this.adminName = u.name || 'Admin'; this.adminImage = u.userImage || ''; this.cdr.detectChanges(); }
     });
   }
 
