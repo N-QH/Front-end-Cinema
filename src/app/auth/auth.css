@@ -58,7 +58,8 @@
   font-size: 16px;
 }
 
-.input-wrapper input {
+.input-wrapper input,
+.input-wrapper select {
   width: 100%;
   padding: 14px 16px 14px 44px;
   border: 1px solid var(--border-color);
@@ -66,9 +67,21 @@
   font-size: 14px;
   transition: all 0.2s ease;
   background-color: var(--bg-color);
+  color: var(--text-main);
+  appearance: none;
+  -webkit-appearance: none;
 }
 
-.input-wrapper input:focus {
+.input-wrapper select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 16px;
+  cursor: pointer;
+}
+
+.input-wrapper input:focus,
+.input-wrapper select:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px var(--primary-light);

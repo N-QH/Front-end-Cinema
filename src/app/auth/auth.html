@@ -47,14 +47,14 @@
             <label for="dateOfBirth">Ngày sinh</label>
             <div class="input-wrapper">
               <i class="fa-solid fa-calendar-day"></i>
-              <input type="date" id="dateOfBirth" name="dateOfBirth" [(ngModel)]="registerData.dateOfBirth" required style="padding-left: 40px; font-family: inherit; width: 100%;" />
+              <input type="date" id="dateOfBirth" name="dateOfBirth" [(ngModel)]="registerData.dateOfBirth" required />
             </div>
           </div>
           <div class="form-group">
             <label for="gender">Giới tính</label>
             <div class="input-wrapper">
               <i class="fa-solid fa-venus-mars"></i>
-              <select id="gender" name="gender" [(ngModel)]="registerData.gender" required style="padding-left: 40px;">
+              <select id="gender" name="gender" [(ngModel)]="registerData.gender" required>
                 <option value="MALE">Nam</option>
                 <option value="FEMALE">Nữ</option>
                 <option value="OTHER">Khác</option>
