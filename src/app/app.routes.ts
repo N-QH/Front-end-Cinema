@@ -16,6 +16,7 @@ import { ForgotPassword } from './forgot-password/forgot-password';
 import { Settings } from './settings/settings';
 import { AdminCoupons } from './admin-coupons/admin-coupons';
 import { Favorites } from './favorites/favorites';
+import { AdminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
   { path: '', component: Home },
@@ -29,10 +30,10 @@ export const routes: Routes = [
   { path: 'tickets', component: Tickets },
   { path: 'profile', component: Profile },
   { path: 'settings', component: Settings },
-  { path: 'admin', component: Admin },
-  { path: 'admin/theaters', component: AdminTheaters },
-  { path: 'admin/shows', component: AdminShows },
-  { path: 'admin/reports', component: Reports },
-  { path: 'admin/customers', component: AdminCustomers },
-  { path: 'admin/coupons', component: AdminCoupons }
+  { path: 'admin', component: Admin, canActivate: [AdminGuard] },
+  { path: 'admin/theaters', component: AdminTheaters, canActivate: [AdminGuard] },
+  { path: 'admin/shows', component: AdminShows, canActivate: [AdminGuard] },
+  { path: 'admin/reports', component: Reports, canActivate: [AdminGuard] },
+  { path: 'admin/customers', component: AdminCustomers, canActivate: [AdminGuard] },
+  { path: 'admin/coupons', component: AdminCoupons, canActivate: [AdminGuard] }
 ];

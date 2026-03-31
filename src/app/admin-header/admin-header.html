@@ -13,7 +13,7 @@
       <div class="notification-dropdown" *ngIf="showNotifications">
         <div class="dropdown-header">
           <h4>Thông báo</h4>
-          <span class="badge-count">{{ unreadCount }} mới</span>
+          <span class="badge-count" (click)="readAll()" style="cursor: pointer;">{{ unreadCount }} mới</span>
         </div>
         <div class="dropdown-body">
           <div class="empty-notif" *ngIf="notifications.length === 0">

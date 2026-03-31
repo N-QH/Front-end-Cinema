@@ -65,10 +65,14 @@ export class AdminHeaderComponent implements OnInit {
     if (!notification.read) {
       this.adminService.markNotificationAsRead(notification.id).subscribe(() => {
         notification.read = true;
-        this.unreadCount = Math.max(0, this.unreadCount - 1);
+        this.updateUnreadCount();
         this.cdr.detectChanges();
       });
     }
+  }
+
+  private updateUnreadCount() {
+    this.unreadCount = this.notifications.filter(n => !n.read).length;
   }
 
   @HostListener('document:click', ['$event'])
