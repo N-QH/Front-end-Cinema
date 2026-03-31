@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { BookingService } from '../services/booking.service';
 import { MovieService } from '../services/movie.service';
 import { ToastService } from '../services/toast.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-admin-shows',
@@ -18,6 +19,8 @@ export class AdminShows implements OnInit {
   isLoading = false;
   isFetching = true;
   savingSeats = false;
+  adminName = 'Admin';
+  adminImage = '';
   
   shows: any[] = [];
   movies: any[] = [];
@@ -44,12 +47,16 @@ export class AdminShows implements OnInit {
     private bookingService: BookingService,
     private movieService: MovieService,
     private toastService: ToastService,
+    private authService: AuthService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
     this.loadShows();
     this.loadLookups();
+    this.authService.userProfile$.subscribe(u => {
+      if (u) { this.adminName = u.name || 'Admin'; this.adminImage = u.userImage || ''; this.cdr.detectChanges(); }
+    });
   }
 
   loadShows() {

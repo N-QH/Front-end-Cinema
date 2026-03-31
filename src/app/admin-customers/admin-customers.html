@@ -41,8 +41,8 @@
       </div>
       <div class="header-actions">
         <div class="admin-user">
-          <img src="https://ui-avatars.com/api/?name=Admin&background=7c3aed&color=fff" alt="Admin" class="avatar" />
-          <span>Admin</span>
+          <img [src]="adminImage || 'https://ui-avatars.com/api/?name=' + adminName + '&background=7c3aed&color=fff'" [alt]="adminName" class="avatar" style="object-fit: cover;" />
+          <span>{{ adminName }}</span>
         </div>
       </div>
     </header>

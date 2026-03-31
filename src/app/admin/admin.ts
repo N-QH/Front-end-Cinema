@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { MovieService } from '../services/movie.service';
 import { ToastService } from '../services/toast.service';
 import { AdminService } from '../services/admin.service';
+import { AuthService } from '../services/auth.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
@@ -24,6 +25,10 @@ export class Admin implements OnInit {
   message: string | null = null;
   error: string | null = null;
   
+  // Admin profile
+  adminName: string = 'Admin';
+  adminImage: string = '';
+
   movies: any[] = [];
   stats: any = {
     ticketsToday: 0,
@@ -57,6 +62,7 @@ export class Admin implements OnInit {
     private cdr: ChangeDetectorRef, 
     private toastService: ToastService,
     private adminService: AdminService,
+    private authService: AuthService,
     private sanitizer: DomSanitizer
   ) {}
 
@@ -70,6 +76,15 @@ export class Admin implements OnInit {
   ngOnInit() {
     this.loadMovies();
     this.loadStats();
+    
+    // Load admin profile
+    this.authService.userProfile$.subscribe(user => {
+      if (user) {
+        this.adminName = user.name || 'Admin';
+        this.adminImage = user.userImage || '';
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   loadStats() {

@@ -200,3 +200,9 @@ body.dark-theme .social-btn:hover {
 .register-link:hover {
   text-decoration: underline;
 }
+
+.required {
+  color: #ef4444;
+  font-weight: 700;
+  margin-left: 2px;
+}

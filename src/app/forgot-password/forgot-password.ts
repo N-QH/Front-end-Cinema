@@ -13,12 +13,12 @@ import { ToastService } from '../services/toast.service';
   styleUrl: './forgot-password.css'
 })
 export class ForgotPassword {
-  step: number = 1; // 1: Email, 2: Token + New Password
+  step: number = 1; // 1: Email verification, 2: New Password
   email: string = '';
-  token: string = '';
   newPassword: string = '';
   confirmPassword: string = '';
   isLoading = false;
+  private verifiedUserId: number | null = null;
 
   constructor(
     private authService: AuthService,
@@ -27,43 +27,58 @@ export class ForgotPassword {
     private cdr: ChangeDetectorRef
   ) {}
 
-  requestOtp() {
+  verifyEmail() {
     if (!this.email) {
       this.toastService.showError('Vui lòng nhập tài khoản email');
       return;
     }
     this.isLoading = true;
     this.cdr.detectChanges();
-    this.authService.requestPasswordReset(this.email).subscribe({
-      next: (res: any) => {
+
+    this.authService.getUserByEmail(this.email).subscribe({
+      next: (user: any) => {
         this.isLoading = false;
-        this.toastService.showSuccess(res || 'Mã OTP đã được gửi đến email của bạn');
-        this.step = 2;
+        if (user && user.id) {
+          this.verifiedUserId = user.id;
+          this.toastService.showSuccess('Đã xác minh email thành công!');
+          this.step = 2;
+        } else {
+          this.toastService.showError('Email không tồn tại trong hệ thống.');
+        }
         this.cdr.detectChanges();
       },
-      error: (err: any) => {
+      error: () => {
         this.isLoading = false;
-        const errorMsg = typeof err.error === 'string' ? err.error : (err.error?.message || 'Có lỗi xảy ra, vui lòng kiểm tra lại email.');
-        this.toastService.showError(errorMsg);
+        this.toastService.showError('Email không tồn tại trong hệ thống.');
         this.cdr.detectChanges();
       }
     });
   }
 
   resetPassword() {
-    if (!this.token || !this.newPassword || !this.confirmPassword) {
+    if (!this.newPassword || !this.confirmPassword) {
       this.toastService.showError('Vui lòng điền đầy đủ thông tin');
+      return;
+    }
+    if (this.newPassword.length < 6) {
+      this.toastService.showError('Mật khẩu phải có ít nhất 6 ký tự');
       return;
     }
     if (this.newPassword !== this.confirmPassword) {
       this.toastService.showError('Mật khẩu xác nhận không khớp');
       return;
     }
+    if (!this.verifiedUserId) {
+      this.toastService.showError('Phiên xác minh đã hết hạn. Vui lòng thử lại.');
+      this.step = 1;
+      return;
+    }
 
     this.isLoading = true;
     this.cdr.detectChanges();
-    this.authService.resetPassword({ token: this.token, newPassword: this.newPassword }).subscribe({
-      next: (res: any) => {
+
+    this.authService.changeUserPassword(this.verifiedUserId, this.newPassword).subscribe({
+      next: () => {
         this.isLoading = false;
         this.toastService.showSuccess('Đổi mật khẩu thành công! Hãy đăng nhập lại.');
         this.router.navigate(['/auth']);
@@ -71,7 +86,7 @@ export class ForgotPassword {
       },
       error: (err: any) => {
         this.isLoading = false;
-        const errorMsg = typeof err.error === 'string' ? err.error : (err.error?.message || 'Lỗi khi xác minh mã OTP');
+        const errorMsg = typeof err.error === 'string' ? err.error : 'Lỗi khi đổi mật khẩu';
         this.toastService.showError(errorMsg);
         this.cdr.detectChanges();
       }

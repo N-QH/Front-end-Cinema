@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { BookingService } from '../services/booking.service';
 import { MovieService } from '../services/movie.service';
 import { ToastService } from '../services/toast.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-admin-coupons',
@@ -20,6 +21,8 @@ export class AdminCoupons implements OnInit {
   isSaving = false;
   isEditMode = false;
   editingCouponId: number | null = null;
+  adminName = 'Admin';
+  adminImage = '';
 
   newCouponData = {
     code: '',
@@ -33,6 +36,7 @@ export class AdminCoupons implements OnInit {
     private bookingService: BookingService,
     private movieService: MovieService,
     private toastService: ToastService,
+    private authService: AuthService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -41,6 +45,9 @@ export class AdminCoupons implements OnInit {
     this.movieService.getMovies().subscribe({
       next: (movies) => { this.allMovies = movies; },
       error: () => {}
+    });
+    this.authService.userProfile$.subscribe(u => {
+      if (u) { this.adminName = u.name || 'Admin'; this.adminImage = u.userImage || ''; this.cdr.detectChanges(); }
     });
   }
 

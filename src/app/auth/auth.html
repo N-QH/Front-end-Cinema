@@ -27,7 +27,7 @@
       
       @if (!isLoginMode) {
         <div class="form-group">
-          <label for="name">Họ và tên</label>
+          <label for="name">Họ và tên <span class="required">*</span></label>
           <div class="input-wrapper">
             <i class="fa-regular fa-user"></i>
             <input type="text" id="name" name="name" [(ngModel)]="registerData.name" placeholder="John Doe" required />
@@ -35,7 +35,7 @@
         </div>
 
         <div class="form-group">
-          <label for="phone">Số điện thoại</label>
+          <label for="phone">Số điện thoại <span class="required">*</span></label>
           <div class="input-wrapper">
             <i class="fa-solid fa-phone"></i>
             <input type="tel" id="phone" name="phone" [(ngModel)]="registerData.mobileNo" placeholder="09xxxxxxx" required />
@@ -44,14 +44,14 @@
 
         <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
           <div class="form-group">
-            <label for="dateOfBirth">Ngày sinh</label>
+            <label for="dateOfBirth">Ngày sinh <span class="required">*</span></label>
             <div class="input-wrapper">
               <i class="fa-solid fa-calendar-day"></i>
               <input type="date" id="dateOfBirth" name="dateOfBirth" [(ngModel)]="registerData.dateOfBirth" required />
             </div>
           </div>
           <div class="form-group">
-            <label for="gender">Giới tính</label>
+            <label for="gender">Giới tính <span class="required">*</span></label>
             <div class="input-wrapper">
               <i class="fa-solid fa-venus-mars"></i>
               <select id="gender" name="gender" [(ngModel)]="registerData.gender" required>
@@ -65,7 +65,7 @@
       }
 
       <div class="form-group">
-        <label for="email">Tài khoản (Email)</label>
+        <label for="email">Tài khoản (Email) <span class="required">*</span></label>
         <div class="input-wrapper">
           <i class="fa-regular fa-envelope"></i>
           @if (isLoginMode) {
@@ -77,7 +77,7 @@
       </div>
 
       <div class="form-group">
-        <label for="password">Mật khẩu</label>
+        <label for="password">Mật khẩu <span class="required">*</span></label>
         <div class="input-wrapper">
           <i class="fa-solid fa-lock"></i>
           @if (isLoginMode) {

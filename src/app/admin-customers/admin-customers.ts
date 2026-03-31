@@ -14,6 +14,8 @@ import { ToastService } from '../services/toast.service';
 export class AdminCustomers implements OnInit {
   users: any[] = [];
   isLoading = true;
+  adminName = 'Admin';
+  adminImage = '';
   
   showAddModal = false;
   isSaving = false;
@@ -47,6 +49,9 @@ export class AdminCustomers implements OnInit {
 
   ngOnInit() {
     this.loadUsers();
+    this.authService.userProfile$.subscribe(u => {
+      if (u) { this.adminName = u.name || 'Admin'; this.adminImage = u.userImage || ''; this.cdr.detectChanges(); }
+    });
   }
 
   loadUsers() {

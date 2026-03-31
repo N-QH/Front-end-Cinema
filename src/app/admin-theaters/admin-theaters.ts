@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BookingService } from '../services/booking.service';
 import { ToastService } from '../services/toast.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-admin-theaters',
@@ -15,6 +16,8 @@ export class AdminTheaters implements OnInit {
   showAddModal = false;
   isLoading = false;
   isFetching = true;
+  adminName = 'Admin';
+  adminImage = '';
   
   theaters: any[] = [];
   
@@ -35,11 +38,15 @@ export class AdminTheaters implements OnInit {
   constructor(
     private bookingService: BookingService,
     private toastService: ToastService,
+    private authService: AuthService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
     this.loadTheaters();
+    this.authService.userProfile$.subscribe(u => {
+      if (u) { this.adminName = u.name || 'Admin'; this.adminImage = u.userImage || ''; this.cdr.detectChanges(); }
+    });
   }
 
   loadTheaters() {
