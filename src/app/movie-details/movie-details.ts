@@ -1,9 +1,10 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MovieService } from '../services/movie.service';
 import { AuthService } from '../services/auth.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-movie-details',
@@ -11,12 +12,15 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
   templateUrl: './movie-details.html',
   styleUrl: './movie-details.css',
 })
-export class MovieDetails implements OnInit {
+export class MovieDetails implements OnInit, OnDestroy {
   movie: any = null;
   isLoading = true;
   showTrailer = false;
   safeTrailerUrl: SafeResourceUrl | null = null;
   userAge: number | null = null;
+
+  isFavorite: boolean = false;
+  private favSub?: Subscription;
 
   openTrailer() {
     this.showTrailer = true;
@@ -24,11 +28,6 @@ export class MovieDetails implements OnInit {
 
   closeTrailer() {
     this.showTrailer = false;
-  }
-
-  get isFavorite(): boolean {
-    if (!this.movie || !this.authService.favoriteMovieIds) return false;
-    return this.authService.favoriteMovieIds.includes(this.movie.id);
   }
 
   get isLoggedIn(): boolean {
@@ -42,11 +41,18 @@ export class MovieDetails implements OnInit {
       return;
     }
 
+    // Optimistic update
+    this.isFavorite = !this.isFavorite;
+    this.cdr.detectChanges();
+
     this.authService.toggleFavoriteMovie(userId, this.movie.id).subscribe({
       next: (res) => {
-        // optimistically updated in AuthService
+        // AuthService will re-emit favoriteMovies$, subscription syncs state
       },
       error: (err) => {
+        // Revert on error
+        this.isFavorite = !this.isFavorite;
+        this.cdr.detectChanges();
         console.error("Lỗi khi thêm phim yêu thích", err);
       }
     });
@@ -60,7 +66,21 @@ export class MovieDetails implements OnInit {
     private sanitizer: DomSanitizer
   ) {}
 
+  ngOnDestroy() {
+    if (this.favSub) {
+      this.favSub.unsubscribe();
+    }
+  }
+
   ngOnInit() {
+    // Subscribe to favorites state so button updates reactively
+    this.favSub = this.authService.favoriteMovies$.subscribe(ids => {
+      if (this.movie) {
+        this.isFavorite = ids.includes(this.movie.id);
+        this.cdr.detectChanges();
+      }
+    });
+
     const email = this.authService.getUserEmail();
     if (email) {
       this.authService.getUserByEmail(email).subscribe({
@@ -87,6 +107,8 @@ export class MovieDetails implements OnInit {
             this.safeTrailerUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.movie.trailerUrl);
           }
           this.isLoading = false;
+          // Sync favorite state now that movie.id is known
+          this.isFavorite = this.authService.favoriteMovieIds.includes(this.movie.id);
           this.cdr.detectChanges();
         },
         error: () => {
