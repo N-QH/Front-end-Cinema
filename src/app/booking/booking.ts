@@ -34,13 +34,17 @@ export class Booking implements OnInit {
   
   seats: SeatInfo[] = [];
   seatRows: string[] = [];
-  selectedSeats: string[] = []; // Store seatNo for display
-  selectedSeatNos: string[] = []; // Redundant but keeping consistent
+  selectedSeats: string[] = [];
+  selectedSeatNos: string[] = [];
   totalPrice = 0;
   userId: number | null = null;
   isOneTapEnabled = false;
   isBooking = false;
   showAuthModal = false;
+
+  // Smart seat selection
+  quickSelectCount: number = 2;
+  isolatedWarningSeat: string | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -206,6 +210,8 @@ export class Booking implements OnInit {
       this.selectedSeats.push(seat.seatNo);
       this.totalPrice += seat.price;
     }
+
+    this.checkIsolatedSeats();
     this.cdr.detectChanges();
   }
 
@@ -219,6 +225,86 @@ export class Booking implements OnInit {
     if (seat.occupied) classes += ' occupied';
     if (this.isSeatSelected(seat.seatNo)) classes += ' selected';
     return classes;
+  }
+
+  // ── Smart Seat Logic ─────────────────────────────────────────────────────
+
+  /** Find and select the best consecutive block of seats */
+  quickSelectSeats() {
+    if (!this.selectedShowId) {
+      this.toastService.showError('Vui lòng chọn suất chiếu trước!');
+      return;
+    }
+    const count = this.quickSelectCount;
+    if (count < 2 || count > 10) {
+      this.toastService.showError('Vui lòng nhập số ghế từ 2 đến 10!');
+      return;
+    }
+
+    // Clear current selection
+    this.selectedSeats = [];
+    this.totalPrice = 0;
+
+    for (const row of this.seatRows) {
+      const rowSeats = this.getSeatsForRow(row).filter(s => !s.occupied);
+      if (rowSeats.length < count) continue;
+
+      // Find a consecutive block
+      for (let i = 0; i <= rowSeats.length - count; i++) {
+        const block = rowSeats.slice(i, i + count);
+        // Check if block is truly consecutive by checking seat indexes
+        const isConsecutive = block.every((s, idx) =>
+          idx === 0 || this.areSeatAdjacent(block[idx - 1].seatNo, s.seatNo)
+        );
+        if (isConsecutive) {
+          block.forEach(s => {
+            this.selectedSeats.push(s.seatNo);
+            this.totalPrice += s.price;
+          });
+          this.checkIsolatedSeats();
+          this.cdr.detectChanges();
+          this.toastService.showSuccess(`Đã chọn ${count} ghế tốt nhất: ${block.map(s => s.seatNo).join(', ')}`);
+          return;
+        }
+      }
+    }
+    this.toastService.showError(`Không tìm được ${count} ghế liền nhau. Vui lòng chọn thủ công!`);
+  }
+
+  /** Check if two seat numbers are adjacent */
+  areSeatAdjacent(a: string, b: string): boolean {
+    const seatsInRow = this.seats
+      .filter(s => {
+        const rA = a.match(/^(\d+)/)?.[1];
+        const rB = b.match(/^(\d+)/)?.[1];
+        const rS = s.seatNo.match(/^(\d+)/)?.[1];
+        return rA === rB && rS === rA;
+      })
+      .sort((x, y) => x.seatNo.localeCompare(y.seatNo, undefined, { numeric: true }));
+
+    const idxA = seatsInRow.findIndex(s => s.seatNo === a);
+    const idxB = seatsInRow.findIndex(s => s.seatNo === b);
+    return Math.abs(idxA - idxB) === 1;
+  }
+
+  /** Warn if selection creates isolated (lonely) seats */
+  checkIsolatedSeats() {
+    this.isolatedWarningSeat = null;
+    for (const row of this.seatRows) {
+      const rowSeats = this.getSeatsForRow(row);
+      for (let i = 0; i < rowSeats.length; i++) {
+        const s = rowSeats[i];
+        if (s.occupied || this.isSeatSelected(s.seatNo)) continue;
+
+        const leftTaken = i === 0 || rowSeats[i-1].occupied || this.isSeatSelected(rowSeats[i-1].seatNo);
+        const rightTaken = i === rowSeats.length - 1 || rowSeats[i+1].occupied || this.isSeatSelected(rowSeats[i+1].seatNo);
+
+        if (leftTaken && rightTaken) {
+          this.isolatedWarningSeat = s.seatNo;
+          return; // one warning is enough
+        }
+      }
+    }
   }
 
   formatPrice(price: number): string {

@@ -63,6 +63,32 @@
 
     <div class="seat-map-panel">
       <h3>4. Chọn ghế</h3>
+
+      <!-- Smart Quick-Select Bar -->
+      @if (selectedShowId) {
+        <div class="smart-seat-bar">
+          <div class="smart-seat-info">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>Chọn nhanh ghế tốt nhất</span>
+          </div>
+          <div class="smart-seat-controls">
+            <button class="qty-btn" (click)="quickSelectCount = quickSelectCount > 2 ? quickSelectCount - 1 : 2">−</button>
+            <span class="qty-display">{{ quickSelectCount }} ghế</span>
+            <button class="qty-btn" (click)="quickSelectCount = quickSelectCount < 10 ? quickSelectCount + 1 : 10">+</button>
+            <button class="quick-select-btn" (click)="quickSelectSeats()">
+              <i class="fa-solid fa-bolt"></i> Chọn ngay
+            </button>
+          </div>
+        </div>
+
+        <!-- Isolated Seat Warning -->
+        @if (isolatedWarningSeat) {
+          <div class="isolated-warning">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            Ghế <strong>{{ isolatedWarningSeat }}</strong> sẽ bị lẻ sau khi bạn chọn!
+          </div>
+        }
+      }
       
       <div class="screen-container">
         <div class="screen"></div>
