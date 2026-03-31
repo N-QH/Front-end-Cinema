@@ -52,8 +52,12 @@
         <div class="user-avatar" routerLink="/tickets" title="Tickets" style="margin-right: 10px;">
           <i class="fa-solid fa-ticket"></i>
         </div>
-        <div class="user-avatar" routerLink="/profile" title="Profile" style="margin-right: 10px;">
-          <i class="fa-regular fa-user"></i>
+        <div class="user-avatar" routerLink="/profile" title="Profile" style="margin-right: 10px; overflow: hidden;">
+          @if (userImage) {
+            <img [src]="userImage" style="width: 100%; height: 100%; object-fit: cover;" alt="avatar">
+          } @else {
+            <i class="fa-regular fa-user"></i>
+          }
         </div>
         <div class="user-avatar" routerLink="/settings" title="Settings" style="margin-right: 10px;">
           <i class="fa-solid fa-gear"></i>

@@ -15,6 +15,7 @@ export class AuthService {
   // Real-time favorite movies feature tracking
   private favoriteMoviesSubject = new BehaviorSubject<number[]>([]);
   public favoriteMovies$ = this.favoriteMoviesSubject.asObservable();
+  public userProfile$ = new BehaviorSubject<any>(null);
   private currentUserId: number | null = null;
 
   constructor(private http: HttpClient) {
@@ -59,6 +60,7 @@ export class AuthService {
       this.getUserByEmail(email).subscribe(user => {
         if (user) {
           this.currentUserId = user.id;
+          this.userProfile$.next(user);
           if (user.favoriteMovies) {
              const ids = user.favoriteMovies.map((m: any) => m.id);
              this.favoriteMoviesSubject.next(ids);

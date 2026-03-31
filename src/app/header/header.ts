@@ -13,6 +13,7 @@ import { Subject, debounceTime, distinctUntilChanged, switchMap, of } from 'rxjs
 })
 export class Header implements OnInit {
   isAdmin = false;
+  userImage: string | null = null;
   searchTerm: string = '';
   searchResults: any[] = [];
   private searchSubject = new Subject<string>();
@@ -27,6 +28,11 @@ export class Header implements OnInit {
   ngOnInit() {
     this.authService.currentUser$.subscribe(() => {
       this.checkAdminRole();
+    });
+
+    this.authService.userProfile$.subscribe(user => {
+      this.userImage = user?.userImage || null;
+      this.cdr.detectChanges();
     });
 
     // Setup debounced search

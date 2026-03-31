@@ -90,6 +90,9 @@ export class Profile implements OnInit {
         this.userProfile.mobileNo = reqOptions.mobileNo;
         this.userProfile.userImage = reqOptions.userImage;
         
+        // Refresh global state so Header updates instantly
+        this.authService.refreshUserFavorites();
+        
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -98,6 +101,8 @@ export class Profile implements OnInit {
           this.toastService.showSuccess('Cập nhật thông tin thành công!');
           this.isSaving = false;
           this.newPassword = ''; // Reset password field
+          this.userProfile.userImage = reqOptions.userImage;
+          this.authService.refreshUserFavorites();
           this.cdr.detectChanges();
           return;
         }
