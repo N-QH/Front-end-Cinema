@@ -8,7 +8,7 @@
     
     <nav class="admin-nav">
       <a href="#" class="nav-item" routerLink="/admin">
-        <i class="fa-solid fa-video"></i> Quản lý Phim
+        <i class="fa-solid fa-chart-line"></i> Dashboard
       </a>
       <a href="#" class="nav-item" routerLink="/admin/theaters">
         <i class="fa-solid fa-building"></i> Quản lý Rạp
@@ -62,6 +62,7 @@
               <th>ID</th>
               <th>Mã</th>
               <th>% Giảm</th>
+              <th>Áp dụng cho</th>
               <th>Đã dùng / Tối đa</th>
               <th>Ngày hết hạn</th>
               <th>Trạng thái</th>
@@ -71,11 +72,11 @@
           <tbody>
             @if (isLoading) {
               <tr>
-                <td colspan="7" style="text-align: center; padding: 20px;">Đang tải dữ liệu...</td>
+                <td colspan="8" style="text-align: center; padding: 20px;">Đang tải dữ liệu...</td>
               </tr>
             } @else if (coupons.length === 0) {
               <tr>
-                <td colspan="7" style="text-align: center; padding: 20px;">Chưa có mã giảm giá nào.</td>
+                <td colspan="8" style="text-align: center; padding: 20px;">Chưa có mã giảm giá nào.</td>
               </tr>
             } @else {
               @for (coupon of coupons; track coupon.id) {
@@ -83,6 +84,11 @@
                   <td>#{{ coupon.id }}</td>
                   <td><strong>{{ coupon.code }}</strong></td>
                   <td>{{ coupon.discountPercent }}%</td>
+                  <td>
+                    <span style="font-size: 13px; color: var(--text-muted);">
+                      {{ getMovieNames(coupon) }}
+                    </span>
+                  </td>
                   <td>{{ coupon.usedCount }} / {{ coupon.maxUses ? coupon.maxUses : '∞' }}</td>
                   <td>{{ formatDate(coupon.expiresAt) }}</td>
                   <td>
@@ -93,6 +99,9 @@
                     }
                   </td>
                   <td>
+                    <button class="action-btn edit" title="Sửa" (click)="openEditModal(coupon)" style="color: #7c3aed;">
+                      <i class="fa-solid fa-pen"></i>
+                    </button>
                     <button class="action-btn edit" [title]="coupon.isActive ? 'Tạm dừng' : 'Kích hoạt lại'" (click)="toggleActive(coupon)">
                       <i class="fa-solid fa-power-off" [style.color]="coupon.isActive ? '#10b981' : '#cbd5e1'"></i>
                     </button>
@@ -114,7 +123,7 @@
 <div class="modal-overlay" (click)="closeAddModal()">
   <div class="modal-content" (click)="$event.stopPropagation()" style="width: 500px;">
     <div class="modal-header">
-      <h3>Tạo Mã Giảm Giá Mới</h3>
+      <h3>{{ isEditMode ? 'Cập Nhật Mã Giảm Giá' : 'Tạo Mã Giảm Giá Mới' }}</h3>
       <button class="modal-close-btn" (click)="closeAddModal()">&times;</button>
     </div>
 
@@ -140,10 +149,29 @@
         <input type="date" class="form-input" [(ngModel)]="newCouponData.expiresAt" name="expiresAt">
       </div>
 
+      <div class="form-group">
+        <label>Áp dụng cho phim (Bỏ trống = Tất cả phim)</label>
+        <div style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 8px; padding: 8px; margin-top: 8px;">
+          @for (movie of allMovies; track movie.id) {
+            <label style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 6px; cursor: pointer; transition: background 0.15s;"
+                   [style.background]="selectedMovieIds.includes(movie.id) ? 'rgba(124, 58, 237, 0.1)' : 'transparent'">
+              <input type="checkbox" [checked]="selectedMovieIds.includes(movie.id)" (change)="toggleMovieSelection(movie.id)" style="accent-color: #7c3aed; width: 16px; height: 16px;">
+              <span style="font-size: 14px;">{{ movie.movieName }}</span>
+            </label>
+          }
+          @if (allMovies.length === 0) {
+            <p style="text-align: center; color: var(--text-muted); padding: 12px; font-size: 14px;">Chưa có phim nào.</p>
+          }
+        </div>
+        @if (selectedMovieIds.length > 0) {
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">Đã chọn {{ selectedMovieIds.length }} phim</p>
+        }
+      </div>
+
       <div class="form-actions" style="margin-top: 24px;">
         <button type="button" class="btn-cancel" (click)="closeAddModal()">Hủy</button>
         <button type="submit" [disabled]="isSaving" class="primary-btn" style="border: none;">
-          {{ isSaving ? 'Đang tạo...' : 'Tạo mã' }}
+          {{ isSaving ? (isEditMode ? 'Đang cập nhật...' : 'Đang tạo...') : (isEditMode ? 'Lưu thay đổi' : 'Tạo mã') }}
         </button>
       </div>
     </form>

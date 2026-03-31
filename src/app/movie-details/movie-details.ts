@@ -26,6 +26,32 @@ export class MovieDetails implements OnInit {
     this.showTrailer = false;
   }
 
+  get isFavorite(): boolean {
+    if (!this.movie || !this.authService.favoriteMovieIds) return false;
+    return this.authService.favoriteMovieIds.includes(this.movie.id);
+  }
+
+  get isLoggedIn(): boolean {
+    return this.authService.getCurrentUserId() !== null;
+  }
+
+  toggleFavorite() {
+    const userId = this.authService.getCurrentUserId();
+    if (!userId) {
+      alert("Vui lòng đăng nhập để lưu phim yêu thích!");
+      return;
+    }
+
+    this.authService.toggleFavoriteMovie(userId, this.movie.id).subscribe({
+      next: (res) => {
+        // optimistically updated in AuthService
+      },
+      error: (err) => {
+        console.error("Lỗi khi thêm phim yêu thích", err);
+      }
+    });
+  }
+
   constructor(
     private route: ActivatedRoute,
     private movieService: MovieService,

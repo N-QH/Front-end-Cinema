@@ -15,6 +15,7 @@ import { AdminCustomers } from './admin-customers/admin-customers';
 import { ForgotPassword } from './forgot-password/forgot-password';
 import { Settings } from './settings/settings';
 import { AdminCoupons } from './admin-coupons/admin-coupons';
+import { Favorites } from './favorites/favorites';
 
 export const routes: Routes = [
   { path: '', component: Home },
@@ -22,6 +23,7 @@ export const routes: Routes = [
   { path: 'auth', component: Auth },
   { path: 'forgot-password', component: ForgotPassword },
   { path: 'movie/:id', component: MovieDetails },
+  { path: 'favorites', component: Favorites },
   { path: 'booking/:id', component: Booking },
   { path: 'payment', component: Payment },
   { path: 'tickets', component: Tickets },

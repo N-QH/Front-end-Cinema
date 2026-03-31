@@ -69,7 +69,7 @@ export class Reports implements OnInit, AfterViewInit {
       data: {
         labels: this.revenueData.map(d => {
             const date = new Date(d.date);
-            return date.toLocaleDateString('vi-VN', { weekday: 'short' });
+            return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
         }),
         datasets: [{
           label: 'Doanh thu (₫)',
@@ -139,5 +139,47 @@ export class Reports implements OnInit, AfterViewInit {
         cutout: '70%'
       }
     });
+  }
+
+  exportToExcel() {
+    // UTF-8 BOM helps Excel recognize the file correctly
+    const BOM = "\uFEFF";
+    let csvContent = BOM + "BÁO CÁO DOANH THU RẠP CHIẾU PHIM\n\n";
+
+    // 1. Top Movies
+    csvContent += "TOP PHIM DOANH THU CAO NHẤT\n";
+    csvContent += "Tên Phim,Doanh Thu\n";
+    this.topMovies.forEach(movie => {
+       csvContent += `"${movie.movieName}","${movie.revenue}"\n`;
+    });
+    csvContent += "\n";
+
+    // 2. Revenue By Day
+    csvContent += "DOANH THU THEO NGÀY\n";
+    csvContent += "Ngày,Doanh Thu\n";
+    this.revenueData.forEach(d => {
+       // Using ="value" forces Excel to treat it as a literal string
+       csvContent += `="""${d.date}""","${d.revenue}"\n`;
+    });
+    csvContent += "\n";
+
+    // 3. Revenue By Theater
+    csvContent += "DOANH THU THEO RẠP\n";
+    csvContent += "Tên rạp,Doanh Thu\n";
+    this.theaterRevenue.forEach(t => {
+       csvContent += `"${t.theaterName}","${t.revenue}"\n`;
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'BaoCaoDoanhThu_Cinema.csv');
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   }
 }

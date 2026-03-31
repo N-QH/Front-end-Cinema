@@ -211,6 +211,21 @@ body.dark-theme .dropdown-toggle:hover {
   to { transform: scale(1); opacity: 1; }
 }
 
+.selected-chip.age-chip {
+  background-color: rgba(251, 146, 60, 0.1);
+  border-color: #fb923c;
+  color: #fb923c;
+}
+
+.selected-chip.age-chip .remove-chip-btn {
+  color: #fb923c;
+}
+
+.selected-chip.age-chip .remove-chip-btn:hover {
+  background-color: rgba(251, 146, 60, 0.2);
+  color: #ea580c;
+}
+
 .movie-groups-container {
   display: flex;
   flex-direction: column;

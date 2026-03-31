@@ -1,0 +1,117 @@
+.favorites-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  min-height: calc(100vh - 80px); /* header padding approx */
+}
+
+.favorites-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+
+.favorites-header h2 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+}
+
+body.light-theme .back-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.header-placeholder {
+  width: 100px; /* same general width as back button for centering */
+}
+
+/* Grid Layout */
+.favorite-movies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 24px;
+}
+
+/* Empty State */
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.3;
+}
+
+.explore-btn {
+  margin-top: 24px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: var(--primary-color);
+  color: white;
+  transition: background 0.2s;
+}
+
+.explore-btn:hover {
+  background: var(--primary-color-hover);
+}
+
+/* Responsive constraints */
+@media (max-width: 768px) {
+  .favorite-movies-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .favorites-header h2 {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .favorite-movies-grid {
+    grid-template-columns: 1fr;
+  }
+  .header-placeholder {
+    display: none;
+  }
+}

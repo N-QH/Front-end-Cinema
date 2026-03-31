@@ -78,8 +78,8 @@
               Mua vé ngay
             </button>
           }
-          <button class="favorite-btn-large">
-            <i class="fa-regular fa-heart"></i>
+          <button class="favorite-btn-large" (click)="toggleFavorite()" style="transition: all 0.2s; cursor: pointer;">
+            <i [class]="isFavorite ? 'fa-solid fa-heart' : 'fa-regular fa-heart'" [style.color]="isFavorite ? '#ef4444' : 'inherit'"></i>
           </button>
         </div>
       } @else {

@@ -14,8 +14,8 @@ import { ToastService } from '../services/toast.service';
 export class Payment implements OnInit, OnDestroy {
   bookingInfo: any;
   isProcessing = false;
-  timeLeft: number = 300;
-  timerString: string = '05:00';
+  timeLeft: number = 0;
+  timerString: string = '--:--';
   intervalId: any;
   holdExpired: boolean = false;
   bookingSuccess: boolean = false;
@@ -68,6 +68,18 @@ export class Payment implements OnInit, OnDestroy {
   }
 
   startTimer(holdEnd: number) {
+    // Calculate initial display from backend's holdEnd
+    const initialDiff = Math.floor((holdEnd - new Date().getTime()) / 1000);
+    if (initialDiff <= 0) {
+      this.timerString = '00:00';
+      this.handleExpiration();
+      return;
+    }
+    this.timeLeft = initialDiff;
+    const im = Math.floor(initialDiff / 60);
+    const is = initialDiff % 60;
+    this.timerString = `${im < 10 ? '0' : ''}${im}:${is < 10 ? '0' : ''}${is}`;
+
     this.intervalId = setInterval(() => {
       const now = new Date().getTime();
       const diff = Math.floor((holdEnd - now) / 1000);
@@ -133,7 +145,7 @@ export class Payment implements OnInit, OnDestroy {
     if (!this.couponCode || this.couponApplied) return;
     this.isApplyingCoupon = true;
     
-    this.bookingService.validateCoupon(this.couponCode).subscribe({
+    this.bookingService.validateCoupon(this.couponCode, this.bookingInfo?.movie?.id).subscribe({
       next: (discount) => {
         this.discountPercent = discount;
         this.discountAmount = this.bookingInfo.totalPrice * (discount / 100);

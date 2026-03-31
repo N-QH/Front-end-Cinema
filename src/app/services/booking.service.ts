@@ -92,6 +92,10 @@ export class BookingService {
     return this.http.post(`${this.apiUrl}/coupon/addNew`, couponRequest);
   }
 
+  updateCoupon(id: number, couponRequest: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/coupon/${id}`, couponRequest, { responseType: 'text' });
+  }
+
   getAllCoupons(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/coupon/all`);
   }
@@ -104,8 +108,12 @@ export class BookingService {
     return this.http.delete(`${this.apiUrl}/coupon/${couponId}`, { responseType: 'text' });
   }
 
-  validateCoupon(code: string): Observable<number> {
-    return this.http.get<number>(`${this.apiUrl}/coupon/validate?code=${code}`);
+  validateCoupon(code: string, movieId?: number): Observable<number> {
+    let url = `${this.apiUrl}/coupon/validate?code=${code}`;
+    if (movieId) {
+      url += `&movieId=${movieId}`;
+    }
+    return this.http.get<number>(url);
   }
 }
 

@@ -17,7 +17,7 @@ export class Profile implements OnInit {
   isLoading = true;
   isSaving = false;
   isUploadingAvatar = false;
-
+  
   userId = -1;
 
   userProfile: any = null;

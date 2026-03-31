@@ -81,6 +81,7 @@ export class Auth implements OnInit {
           const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
           this.router.navigateByUrl(returnUrl);
           this.isLoading = false;
+          this.cdr.detectChanges();
         },
         error: (err) => {
           if (err.error && typeof err.error === 'string' && err.error.includes("Tài khoản của bạn đã bị khóa")) {
@@ -89,6 +90,7 @@ export class Auth implements OnInit {
             this.error = 'Email hoặc mật khẩu không chính xác';
           }
           this.isLoading = false;
+          this.cdr.detectChanges();
         }
       });
     } else {
@@ -107,11 +109,13 @@ export class Auth implements OnInit {
                 window.location.reload(); // Force reload to ensure Header and other components sync state
               });
               this.isLoading = false;
+              this.cdr.detectChanges();
             },
             error: () => {
               // Fallback if auto-login fails
               this.router.navigate(['/auth']);
               this.isLoading = false;
+              this.cdr.detectChanges();
             }
           });
         },
@@ -120,6 +124,7 @@ export class Auth implements OnInit {
           this.toastService.showError(errMsg);
           this.error = errMsg;
           this.isLoading = false;
+          this.cdr.detectChanges();
         }
       });
     }

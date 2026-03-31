@@ -17,10 +17,22 @@ export class Category implements OnInit {
 
   activeTab: 'NOW_SHOWING' | 'COMING_SOON' = 'NOW_SHOWING';
   showGenreDropdown = false;
+  showAgeDropdown = false;
   
-  // Fake genre data for the filter bar
+  // Genre data for the filter bar
   availableGenres: string[] = ['ACTION', 'COMEDY', 'DRAMA', 'HORROR', 'ROMANCE', 'SCI_FI', 'THRILLER', 'ANIMATION', 'ADVENTURE'];
   selectedGenres: string[] = [];
+  
+  // Age rating filter
+  availableAgeRatings: string[] = ['P', '13', '16', '18'];
+  selectedAgeRatings: string[] = [];
+  
+  ageTranslations: any = {
+    'P': 'Mọi lứa tuổi (P)',
+    '13': 'Từ 13 tuổi (13+)',
+    '16': 'Từ 16 tuổi (16+)',
+    '18': 'Từ 18 tuổi (18+)'
+  };
   
   genreTranslations: any = {
     'ACTION': 'Hành động',
@@ -104,14 +116,32 @@ export class Category implements OnInit {
     this.applyFilters();
   }
 
+  toggleAgeRating(age: string) {
+    const index = this.selectedAgeRatings.indexOf(age);
+    if (index > -1) {
+      this.selectedAgeRatings.splice(index, 1);
+    } else {
+      this.selectedAgeRatings.push(age);
+    }
+    this.applyFilters();
+  }
+
   groupedMovies: { genre: string, movies: any[] }[] = [];
 
   applyFilters() {
     // Stage 1: Filter by tab (Now Showing / Coming Soon)
-    const tabFiltered = this.movies.filter(movie => {
+    let tabFiltered = this.movies.filter(movie => {
       const matchTab = this.activeTab === 'NOW_SHOWING' ? !movie.isUpcoming : movie.isUpcoming;
       return matchTab;
     });
+
+    // Stage 1.5: Filter by age rating if any are selected
+    if (this.selectedAgeRatings.length > 0) {
+      tabFiltered = tabFiltered.filter(movie => {
+        const movieAge = movie.ageRequirement ? String(movie.ageRequirement) : 'P';
+        return this.selectedAgeRatings.includes(movieAge);
+      });
+    }
 
     // Stage 2: Group by genres
     // If genres are selected, only show those genre blocks.

@@ -27,13 +27,41 @@
       }
     </div>
 
-    <!-- Selected Genres Bar -->
-    @if (selectedGenres.length > 0) {
+    <div class="dropdown-wrapper" (mouseenter)="showAgeDropdown = true" (mouseleave)="showAgeDropdown = false">
+      <button class="dropdown-toggle" (click)="showAgeDropdown = !showAgeDropdown">
+        Độ tuổi <i class="fa-solid fa-chevron-down ms-2"></i>
+      </button>
+      
+      @if (showAgeDropdown) {
+        <div class="dropdown-menu">
+          <div class="dropdown-grid">
+            @for (age of availableAgeRatings; track age) {
+              <div class="genre-item" 
+                   [class.active]="selectedAgeRatings.includes(age)"
+                   (click)="toggleAgeRating(age)">
+                {{ ageTranslations[age] || age }}
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Selected Filters Bar -->
+    @if (selectedGenres.length > 0 || selectedAgeRatings.length > 0) {
       <div class="selected-genres-bar">
         @for (genre of selectedGenres; track genre) {
           <div class="selected-chip">
             {{ genreTranslations[genre] || genre }}
             <button class="remove-chip-btn" (click)="toggleGenre(genre)">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        }
+        @for (age of selectedAgeRatings; track age) {
+          <div class="selected-chip age-chip">
+            {{ ageTranslations[age] || age }}
+            <button class="remove-chip-btn" (click)="toggleAgeRating(age)">
               <i class="fa-solid fa-xmark"></i>
             </button>
           </div>

@@ -11,11 +11,22 @@ export class AuthService {
   private apiUrl = environment.apiUrl + '/user';
   private currentUserSubject = new BehaviorSubject<string | null>(this.getToken());
   public currentUser$ = this.currentUserSubject.asObservable();
+  
+  // Real-time favorite movies feature tracking
+  private favoriteMoviesSubject = new BehaviorSubject<number[]>([]);
+  public favoriteMovies$ = this.favoriteMoviesSubject.asObservable();
+  private currentUserId: number | null = null;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    this.refreshUserFavorites();
+  }
 
   public get currentUserValue(): string | null {
     return this.currentUserSubject.value;
+  }
+
+  public get favoriteMovieIds(): number[] {
+    return this.favoriteMoviesSubject.value;
   }
 
   getToken(): string | null {
@@ -42,6 +53,36 @@ export class AuthService {
     return this.http.get<any>(`${this.apiUrl}/email/${email}`);
   }
 
+  refreshUserFavorites() {
+    const email = this.getUserEmail();
+    if (email) {
+      this.getUserByEmail(email).subscribe(user => {
+        if (user) {
+          this.currentUserId = user.id;
+          if (user.favoriteMovies) {
+             const ids = user.favoriteMovies.map((m: any) => m.id);
+             this.favoriteMoviesSubject.next(ids);
+          }
+        }
+      });
+    }
+  }
+
+  toggleFavoriteMovie(userId: number, movieId: number): Observable<string> {
+    return this.http.post(`${this.apiUrl}/${userId}/favorite/${movieId}`, {}, { responseType: 'text' }).pipe(
+      tap(() => {
+        // Optimistically or reactively update internal state
+        const currentMids = this.favoriteMoviesSubject.value;
+        const index = currentMids.indexOf(movieId);
+        if (index > -1) {
+           this.favoriteMoviesSubject.next(currentMids.filter(id => id !== movieId));
+        } else {
+           this.favoriteMoviesSubject.next([...currentMids, movieId]);
+        }
+      })
+    );
+  }
+
   login(credentials: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/login`, credentials, { responseType: 'text' })
       .pipe(tap((token: string) => {
@@ -49,6 +90,7 @@ export class AuthService {
             localStorage.setItem('token', token);
         }
         this.currentUserSubject.next(token);
+        this.refreshUserFavorites();
       }));
   }
 
@@ -70,6 +112,12 @@ export class AuthService {
         localStorage.removeItem('token');
     }
     this.currentUserSubject.next(null);
+    this.favoriteMoviesSubject.next([]);
+    this.currentUserId = null;
+  }
+
+  public getCurrentUserId(): number | null {
+    return this.currentUserId;
   }
 
   getUserProfile(userId: number): Observable<any> {

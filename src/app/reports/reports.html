@@ -10,13 +10,10 @@
       <a href="#" class="nav-item" routerLink="/admin">
         <i class="fa-solid fa-chart-line"></i> Dashboard
       </a>
-      <a href="#" class="nav-item">
-        <i class="fa-solid fa-video"></i> Quản lý Phim
-      </a>
-      <a href="#" class="nav-item">
+      <a href="#" class="nav-item" routerLink="/admin/theaters">
         <i class="fa-solid fa-building"></i> Quản lý Rạp
       </a>
-      <a href="#" class="nav-item">
+      <a href="#" class="nav-item" routerLink="/admin/shows">
         <i class="fa-solid fa-calendar-alt"></i> Lịch chiếu
       </a>
       <a href="#" class="nav-item" routerLink="/admin/customers">
@@ -56,13 +53,15 @@
       <div class="page-header">
         <h2>Báo cáo Doanh thu</h2>
         <div class="header-filters">
+          <!-- Filter options temporarily hidden 
           <select class="report-select">
             <option>Theo tuần</option>
             <option>Theo tháng</option>
             <option>Theo năm</option>
             <option>Tùy chỉnh...</option>
           </select>
-          <button class="export-btn"><i class="fa-solid fa-download"></i> Xuất báo cáo</button>
+          -->
+          <button class="export-btn" (click)="exportToExcel()"><i class="fa-solid fa-file-csv"></i> Xuất CSV (Excel)</button>
         </div>
       </div>
 

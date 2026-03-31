@@ -1,0 +1,29 @@
+<div class="favorites-container">
+  <div class="favorites-header">
+    <button class="back-btn" routerLink="/">
+      <i class="fa-solid fa-arrow-left"></i> Trang chủ
+    </button>
+    <h2>Phim Yêu Thích Của Tôi</h2>
+    <div class="header-placeholder"></div>
+  </div>
+
+  <div class="favorites-content">
+    @if (isLoading) {
+      <div style="text-align: center; padding: 40px; color: var(--text-secondary);">Đang tải thông tin...</div>
+    } @else {
+      <div class="favorite-movies-grid">
+        @if (!favoriteMovies || favoriteMovies.length === 0) {
+          <div class="empty-state">
+            <i class="fa-solid fa-heart-crack empty-icon"></i>
+            <p>Bạn chưa có phim yêu thích nào.</p>
+            <button class="primary-btn explore-btn" routerLink="/">Khám phá Phim Ngay</button>
+          </div>
+        } @else {
+          @for (movie of favoriteMovies; track movie.id) {
+            <app-movie-item [movie]="movie" [gridMode]="true"></app-movie-item>
+          }
+        }
+      </div>
+    }
+  </div>
+</div>

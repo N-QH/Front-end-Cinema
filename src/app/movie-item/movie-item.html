@@ -20,8 +20,8 @@
           <i class="fa-solid fa-star"></i>
           <span style="font-size: 14px; margin-left: 4px; font-weight: 500;">{{ movie?.rating || 0 }}</span>
         </div>
-        <button class="favorite-btn" (click)="$event.stopPropagation()">
-          <i class="fa-regular fa-heart"></i>
+        <button class="favorite-btn" (click)="toggleFavorite($event)">
+          <i [class]="isFavorite ? 'fa-solid fa-heart' : 'fa-regular fa-heart'" [style.color]="isFavorite ? '#ef4444' : 'inherit'" style="transition: color 0.2s;"></i>
         </button>
       </div>
     </div>
