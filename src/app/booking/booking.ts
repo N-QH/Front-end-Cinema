@@ -95,7 +95,17 @@ export class Booking implements OnInit {
 
   onTheaterChange(theaterId: number) {
     this.selectedTheaterId = theaterId;
+    this.resetBookingState();
     this.updateAvailableDates();
+  }
+
+  resetBookingState() {
+    this.selectedDate = null;
+    this.selectedShowId = null;
+    this.showsForSelectedDate = [];
+    this.seats = [];
+    this.selectedSeats = [];
+    this.totalPrice = 0;
   }
 
   updateAvailableDates() {
@@ -107,8 +117,7 @@ export class Booking implements OnInit {
     }
 
     const theaterShows = this.shows.filter(s => (s.theater?.id === this.selectedTheaterId));
-    // Fallback if shows don't have theater populated in frontend DTO, but they typically should.
-    const relevantShows = theaterShows.length > 0 ? theaterShows : this.shows;
+    const relevantShows = theaterShows;
 
     const tempDates = new Set<string>();
     relevantShows.forEach(s => tempDates.add(s.showDate));
